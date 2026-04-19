@@ -12,12 +12,8 @@ Its primary goal is to shift the AI from a "generic helper" to a "Project-Specif
 
 ## 2. Core Pillars & Workflow
 
-### Phase 1: Socratic Interrogation
-The entrypoint to NeuroGenesis. Upon invocation (e.g., `/genesis` or `bd create init`), the system acts as a Socratic interviewer to extract:
-*   **Domain / Industry:** (e.g., MedTech, FinTech, Indie Game)
-*   **Risk Profile:** (Compliance-heavy vs. Startup speed)
-*   **Target Audience / Scale:** (Internal tool vs. global consumer app)
-*   **Preferred Tech Stack:** (Languages, frameworks, cloud providers)
+### Phase 1: Socratic Inquisitor
+The entrypoint to NeuroGenesis. Upon invocation (e.g., `/genesis` or `bd create init`), the system acts as a Socratic Inquisitor to extract the true nature of the project. It does not just accept basic facts; it uses them to open conceptual buckets and continuously drills down into the dimensions of the architecture (e.g., Domain, Risk, Target Audience, Tech Stack, Emphasis priorities).
 
 ### Phase 2: The Constitution (`genesis-context.json`)
 The extracted context is compiled into an immutable JSON artifact (`genesis-context.json`). This acts as the project's Constitution. All subsequent agents, including the Lead Agent and the Adversarial Panel, will mount this file to ground their decisions.
