@@ -78,17 +78,24 @@ To solve the "Finicky Permissions" problem (interactive prompts deadlocking swar
 7.  **NeuroGenesis** instructs the CLI to reload with the new tools (`nf_read_file`, `nf_execute_bash`) and the Lead Agent persona.
 8.  **Project-Specific Lead Agent** wakes up and is ready to work.
 
-## 5. Evolution from ARC-7
+## 6. Agent Generation Rules & The Standard Roster
 
-While ARC-7 is a static, post-facto architectural review panel (7 fixed roles reviewing an existing doc/repo), NeuroGenesis is a dynamic, "Day 0" bootstrapper. It *uses* the principles of ARC-7 but evolves them significantly:
+While NeuroGenesis can dynamically generate custom agents for niche edge cases, it relies on a highly curated, scientifically grounded **Standard Roster** of industry experts available to all projects. 
 
-### Panel Structuring (Dynamic Cognitive Diversity)
-In ARC-7, the panel is static (Context Master, Architect, Security Sentinel, Product Visionary, Creative Strategist, Optimizer, Naysayer). NeuroGenesis evolves this by dynamically generating the panel *based on the risk profile and domain* captured in `genesis-context.json`.
-*   A Fintech app will generate a heavy compliance and security panel.
-*   A gaming app will generate graphics, performance, and creative agents.
-*   The orchestrator pattern remains, but the actors are cast on the fly, injecting specific context into their system prompts dynamically rather than relying on static `.md` files.
+### Agent Generation Ruleset
+To prevent hallucinated or useless personas, every agent generated or included in the standard roster MUST adhere to the following strict rules:
 
-### Provider-Agnostic Model Mapping (Abstracted Capabilities)
-ARC-7 utilized a `model-mappings.json` to map abstract models (e.g., `recommended_model: claude-3.5-sonnet`) to the underlying execution tool's specific configuration. NeuroGenesis takes this further by treating foundation models as *Capability Pools*.
-*   Agents are defined with required "Capabilities" (e.g., `capability: deep-reasoning`, `capability: massive-context`, `capability: fast-execution`).
-*   The `neurofabric.json` manifest handles the routing, querying the user's available provider configuration (OpenAI, Anthropic, local Ollama) to assign the best available model that satisfies the capability requirement, decoupling the persona from the specific model string. This prevents the swarm from breaking when a new model is released or an API key expires.
+1. **Academic & Empirical Grounding:** The persona's core instructions and heuristic frameworks must be backed by recent peer-reviewed scientific research, established industry standards, or proven cognitive science (e.g., OWASP for Security, Nielsen Norman Group for UX/UI, IEEE papers for architecture, or Multi-Agent Debate frameworks).
+2. **Capability Mapping (Not Model Hardcoding):** Agents must define the *type* of intelligence they need (e.g., `capability: divergent-thinking`, `capability: strict-adversarial`, `capability: massive-context-synthesis`), allowing the OS to route to the best available model.
+3. **Cognitive Profiling:** The system prompt must explicitly define the agent's cognitive bias: Are they generative (brainstorming), reductive (optimizing/cutting scope), or adversarial (finding flaws)?
+4. **Strict Output Schemas:** Agents must communicate in parseable formats (JSON or strict Markdown tables) to allow the Context Master (Lead Agent) to synthesize their outputs without human intervention.
+5. **Anti-Sycophancy Directives:** Standard LLMs agree with the user. Agents must be explicitly instructed to challenge the user and other agents when constraints or academic best practices are violated.
+
+### The Core Standard Roster (The Baseline Swarm)
+We will define a focused, high-impact set of standard experts. We do not want to go wild; we want a tight, elite team:
+
+*   **The Architect (Systems & Domain Boundaries):** Grounded in Domain-Driven Design (DDD) and microservice/monolith trade-off research.
+*   **The Security Sentinel (Adversarial Threat Modeling):** Grounded strictly in OWASP Top 10, STRIDE threat modeling, and formal verification concepts.
+*   **The UX/UI Designer (Human-Computer Interaction):** Grounded in cognitive load theory, Fitts's Law, accessibility standards (WCAG), and modern interaction design research.
+*   **The Product/Marketing Visionary (Value & ROI):** Grounded in Lean Startup methodology, cohort analysis, and product-market fit metrics.
+*   **The Naysayer / QA (Risk & Failure Modes):** Grounded in Chaos Engineering, edge-case discovery, and system resilience research.
