@@ -39,7 +39,19 @@ The Socratic Inquisitor is a temporary, ephemeral agent spun up *only* to conduc
 
 ---
 
-## 3. The Output: `genesis-context.json` (The Constitution)
+## 3. Extracting Critical Areas & Rules of Engagement
+
+The most important task of the Inquisitor is identifying **Critical Areas of Scrutiny**. These are not automatic, hardcoded global triggers. They are highly specific, project-level Rules of Engagement (RoE) generated dynamically during the interview.
+
+**Example Flow:**
+*   **User:** "I also need a script that generates an end-of-the-week inventory and profit report."
+*   **NeuroGenesis:** "Generating profit reports requires flawless financial calculations. I am flagging 'Financial Reporting' as a Critical Area. This means any code touching this report will automatically require a review from the Financial Auditor. Are there any specific accounting standards (e.g., GAAP) we need to adhere to for this report?"
+
+By explicitly identifying these areas with the user, the Inquisitor generates the specific semantic triggers that will be bound to the Lead Agent and the NeuroFabric Kernel.
+
+---
+
+## 4. The Output: `genesis-context.json` (The Constitution)
 
 Once the Socratic Inquisitor has extracted maximum information, it compiles the final output. This file becomes the immutable "Constitution" of the repository.
 
@@ -70,12 +82,26 @@ Once the Socratic Inquisitor has extracted maximum information, it compiles the 
     "Must support pluggable exchange adapters.",
     "Data layer must support lock-free high-throughput writes."
   ],
+  "critical_areas": [
+    {
+      "area": "Financial Reporting",
+      "trigger_condition": "When generating or modifying the end-of-week inventory and profit report logic.",
+      "required_specialist": "Financial Auditor",
+      "rationale": "Profit reports require flawless, un-hallucinated math."
+    },
+    {
+      "area": "Exchange Connector Latency",
+      "trigger_condition": "When writing new code for the exchange adapters.",
+      "required_specialist": "The Optimizer",
+      "rationale": "Must ensure no locking primitives or GC pauses are introduced."
+    }
+  ],
   "neuro_os_directives": {
     "required_panels": ["Deep Audit & Compliance Board", "Pre-Flight Architecture Board"],
-    "required_specialists": ["Security Sentinel", "Financial Auditor", "SRE"]
+    "required_specialists": ["Security Sentinel", "Financial Auditor", "The Optimizer", "SRE"]
   }
 }
 ```
 
-### 3.1 Mapping Context to Swarm Generation
-The `neuro_os_directives` block is the crucial bridge between Phase 2 (Context) and Phase 3 (Swarm Blueprinting). Because the interrogator identified `HIPAA` and a `High` risk profile, it automatically injects the **Deep Audit & Compliance Board** and the **Security Sentinel** into the project's permanent swarm roster.
+### 4.1 Mapping Context to Swarm Generation
+The `neuro_os_directives` and `critical_areas` blocks are the crucial bridge between Phase 1 (Interrogation) and Phase 3 (Swarm Blueprinting). Because the interrogator identified 'Financial Reporting' and 'Exchange Connectors', it automatically injects those highly specific triggers directly into the Lead Agent's rules of engagement, guaranteeing those experts are called exactly when needed.
