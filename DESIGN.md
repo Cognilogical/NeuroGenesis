@@ -42,8 +42,12 @@ To solve the "Directory Binding" problem where CLI tools act generically, NeuroG
 *   These files symlink or reference the `.neurogenesis/lead_agent.json` definition.
 
 ### Phase 7: The "Soul" Injection (NeuroStrata Personal Memory Integration)
-Unlike generic static prompts or projects that rely on crude, bloated `Soul.md` files that clobber the context window, Neuro OS treats its agents as continuously evolving entities backed by the **NeuroStrata Memory Architecture** (a shared LanceDB knowledge graph).
-When an agent is initialized, it is granted read/write access to its own personal memory namespace (e.g., `namespace: "global"`, `agent_name: "Security Sentinel"`). This gives the agent a persistent "Soul" independent of any specific project's `genesis-context.json`. As the agent encounters novel solutions or is corrected on domain-specific facts across different projects, it writes those revelations into NeuroStrata, actively increasing its competency and evolving its heuristic frameworks over time.
+Unlike generic static prompts or projects that rely on crude, bloated `Soul.md` files that clobber the context window, Neuro OS treats its agents as continuously evolving entities backed by a shared knowledge graph.
+When an agent is initialized, it is connected to the OS's memory architecture. NeuroGenesis dictates **what** the agent should remember (e.g., domain-specific corrections, novel framework bugs) and **how to categorize it** (e.g., as a global heuristic vs. a project-specific quirk). 
+
+Crucially, NeuroGenesis strictly avoids telling the agent **how** to save the memory (e.g., it does not hardcode specific tool names like `neurostrata_add_memory` or paths to specific `.md` files). The memory architecture itself injects the "how" (the specific tool syntax). This separation of concerns prevents conflicting instructions, avoids confusing the LLM with duplicate tool definitions, and ensures the agent always follows the latest memory system protocol natively.
+
+As the agent encounters novel solutions or is corrected on domain-specific facts across different projects, it writes those revelations into its personal namespace, actively increasing its competency and evolving its heuristic frameworks over time without needing manual prompt updates.
 
 ## 3. Directory Structure
 
