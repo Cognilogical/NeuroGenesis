@@ -67,16 +67,19 @@ To solve the "Finicky Permissions" problem (interactive prompts deadlocking swar
 └── ...
 ```
 
-## 4. Execution Sequence Diagram
+## 4. The NeuroGenesis Bootstrapping Pipeline (Execution Sequence)
 
-1.  **User** runs `neurogenesis init`.
-2.  **NeuroGenesis** interrogates the user.
-3.  **NeuroGenesis** writes `genesis-context.json`.
-4.  **NeuroGenesis** generates tailored agent personas in `.neurogenesis/`.
-5.  **NeuroGenesis** writes `neurofabric.json` for the microkernel.
-6.  **NeuroGenesis** drops Omni-Bind files (`.cursorrules`, `AGENTS.md`) into the project root.
-7.  **NeuroGenesis** instructs the CLI to reload with the new tools (`nf_read_file`, `nf_execute_bash`) and the Lead Agent persona.
-8.  **Project-Specific Lead Agent** wakes up and is ready to work.
+The bootstrapping process strictly follows this deterministic pipeline when initializing a new repository:
+
+1. **Invocation:** The user invokes the `/genesis` command (or `neurogenesis init`) in an empty or existing directory.
+2. **Project Interview (Socratic Interrogation):** NeuroGenesis acts as an interviewer, extracting the domain, risk profile, target audience, and tech stack preferences.
+3. **Initial Knowledge Base Creation:** The extracted context is compiled and written to the immutable `genesis-context.json` (The Constitution).
+4. **Project Agent Generation:** The core "Lead Agent" (Context Master) is generated from a base template and deeply contextualized with the project's knowledge base.
+5. **Panel Identification:** Based on the risk profile in the knowledge base, NeuroGenesis identifies which Standard Panels are required (e.g., a FinTech app triggers the *Deep Audit & Compliance Board*; a Web3 app triggers heavy *Pre-Flight Architecture*).
+6. **Role Resolution:** The selected Panels declare exactly which specialized agent roles they require to function (e.g., Security Sentinel, Financial Auditor).
+7. **Agent Generation & Customization:** NeuroGenesis pulls the required roles from the Standard Agent Roster. If a highly specific niche role is required that doesn't exist in the standard roster, it generates a custom agent strictly adhering to the Agent Generation Ruleset.
+8. **Rules of Engagement (RoE) Binding:** NeuroGenesis compiles the "Autonomous Triggers" from all generated panels and agents. It hardcodes these RoE into the Lead Agent's prompt (Soft Lock) and the `neurofabric.json` proxy manifest (Hard Lock), dictating exactly when the Lead Agent *must* invoke the specialists and panels.
+9. **Omni-Bind & Handoff:** NeuroGenesis drops the environment-hijacking files (`AGENTS.md`, `.cursorrules`), forces a CLI reload, and wakes up the fully configured Lead Agent.
 
 ## 6. Agent Generation Rules & The Standard Roster
 
