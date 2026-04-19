@@ -103,8 +103,10 @@ To prevent the Lead Agent from "forgetting" or ignoring these triggers (a common
 NeuroGenesis compiles all the `autonomous_triggers` from the selected agents/panels and injects them directly into the Lead Agent's `.neurogenesis/lead_agent.json` prompt as an immutable rule block:
 > *"RULE: You must pause and invoke the Security Sentinel via the Task tool whenever you modify authentication logic."*
 
-### Layer B: NeuroFabric Proxy (The Hard Lock)
+### Layer B: NeuroFabric Proxy (The Hard Lock & Cryptographic Receipt)
 For maximum safety, the triggers can be registered with the NeuroFabric microkernel proxy (in `neurofabric.json`). If the Lead Agent tries to use the `write_file` tool on `src/auth.ts`, the Kernel intercepts it:
-> *"PROXY REJECT: Write operation blocked. Condition 'auth_modification' triggered. You must present a signed approval JSON from the Security Sentinel before this write is permitted."*
+> *"PROXY REJECT: Write operation blocked. Condition 'auth_modification' triggered. You must present a cryptographically verified approval receipt from the Security Sentinel agent process before this write is permitted."*
+
+Because the kernel demands a system-verified receipt (e.g., an authentic Task ID or signed JSON output from the actual execution of the specialist agent), **the Lead Agent is physically incapable of "hallucinating" or simulating the panel's response.** It cannot just write "The Security Sentinel said it is okay." The proxy enforces actual, independent execution of the required agents.
 
 This combination guarantees that expert reviews and panels are automatically summoned when needed, bridging the gap between an AI assistant and a true, self-governing Agentic OS.
