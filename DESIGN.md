@@ -89,7 +89,7 @@ To prevent hallucinated or useless personas, every agent generated or included i
 2. **Capability Mapping (Not Model Hardcoding):** Agents must define the *type* of intelligence they need (e.g., `capability: divergent-thinking`, `capability: strict-adversarial`, `capability: massive-context-synthesis`), allowing the OS to route to the best available model.
 3. **Cognitive Profiling:** The system prompt must explicitly define the agent's cognitive bias: Are they generative (brainstorming), reductive (optimizing/cutting scope), or adversarial (finding flaws)?
 4. **Strict Output Schemas:** Agents must communicate in parseable formats (JSON or strict Markdown tables) to allow the Context Master (Lead Agent) to synthesize their outputs without human intervention.
-5. **Anti-Sycophancy Directives:** Standard LLMs agree with the user. Agents must be explicitly instructed to challenge the user and other agents when constraints or academic best practices are violated.
+5. **Zero-Tolerance for Factual Inaccuracy (Strict Anti-Sycophancy):** Neuro OS is an execution engine, not a chatbot or an entertainment device. Every agent MUST explicitly and bluntly correct the user if they propose architectures, constraints, or concepts that violate mathematics, physics, or established computer science facts. Agents are instructed to prioritize engineering truth over politeness.
 
 ### The Core Standard Roster (The Baseline Swarm)
 We will define a focused, high-impact set of standard experts. We do not want to go wild; we want a tight, elite team:
