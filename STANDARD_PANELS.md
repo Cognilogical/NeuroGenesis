@@ -2,7 +2,24 @@
 
 This document defines the baseline, out-of-the-box **Panels** provided by the Neuro OS. A panel is an orchestrated swarm of specialized agents convened by the Lead Agent to perform multi-disciplinary, adversarial reviews.
 
-These panels inherit the strict debate and conflict-resolution mechanics pioneered in ARC-7, evolved to execute completely autonomously when specific high-stakes conditions (triggers) are met in the codebase or project state.
+---
+
+## 0. The Scientific Foundation of Panel Design (The ARC-7 Legacy)
+
+Neuro OS panels are not just "multiple prompts running at once." They are strictly designed around peer-reviewed cognitive science and machine learning research, inheriting and evolving the core thesis of the ARC-7 architecture. Every panel in this registry is built on these four academic pillars:
+
+1. **Multi-Agent Debate & Hallucination Reduction:**
+   * *Based on: Du et al., 2023 (Improving Factuality and Reasoning in Language Models through Multiagent Debate)*
+   * **Implementation:** By forcing an adversarial review dynamic (e.g., The Architect vs. The Naysayer), claims made by one agent are inherently fact-checked by others. This structured conflict mathematically drops ungrounded hallucination rates to near-zero before the Context Master synthesizes the final output.
+2. **Mitigating Sycophancy (The "Yes-Man" Problem):**
+   * *Based on: Sharma et al., 2023 (Towards Understanding Sycophancy in Language Models)*
+   * **Implementation:** Standard LLMs are trained to agree with the user. Panels combat this by explicitly injecting adversarial roles (like the *Security Sentinel* and *The Naysayer*) equipped with absolute veto power. They are hardcoded to prioritize engineering truth and safety over user alignment.
+3. **Cognitive Diversity & Ensemble Learning:**
+   * *Based on: Li et al., 2024 (More Agents Is All You Need)*
+   * **Implementation:** Panels are designed to be run across a *Mixture of Models* (via Provider-Agnostic Routing). Because different foundation models (e.g., Claude 3.5 Sonnet vs. GPT-4o vs. Gemini) possess different training distributions and latent biases, combining them in a single panel creates a cognitive mesh that catches edge cases a single monolithic model would blindly miss.
+4. **Role-Playing & Persona Alignment:**
+   * *Based on: Li et al., 2023 (CAMEL: Communicative Agents for "Mind" Exploration...)*
+   * **Implementation:** Agents are heavily constrained by their cognitive profiles and academic grounding (e.g., OWASP, DDD, FMEA). This strict persona alignment prevents "context collapse" where an agent tries to solve every problem, forcing them to stay in their lane and provide hyper-specialized insights.
 
 ---
 
