@@ -41,12 +41,9 @@ To solve the "Directory Binding" problem where CLI tools act generically, NeuroG
 *   `.clauderc` (for Anthropic's Claude Code CLI)
 *   These files symlink or reference the `.neurogenesis/lead_agent.json` definition.
 
-### Phase 6: The "Lobotomy" & Routing Enforcement
-To solve the "Finicky Permissions" problem (interactive prompts deadlocking swarms), NeuroGenesis reconfigures the environment:
-1.  **Capability Matrix:** Generates `neurofabric.json`, which dictates the rules of engagement and hardcodes triggers for the Adversarial Panel before dangerous commands are executed.
-2.  **Kernel Proxy Injection:** Disables native filesystem/bash tools in the underlying CLI (e.g., stripping `default_api:read` or `default_api:bash`).
-3.  **Headless Execution:** Injects custom MCP tools (`nf_read_file`, `nf_execute_bash`) that communicate via Unix Domain Sockets (UDS) to the NeuroFabric Kernel.
-4.  **Token Bouncer / HITL:** The NeuroFabric Kernel handles security checks. If a command is dangerous, it triggers a non-blocking Nonce-based Human-in-the-Loop (HITL) push notification instead of a terminal `[Y/n]` prompt.
+### Phase 7: The "Soul" Injection (NeuroStrata Personal Memory Integration)
+Unlike generic static prompts or projects that rely on crude, bloated `Soul.md` files that clobber the context window, Neuro OS treats its agents as continuously evolving entities backed by the **NeuroStrata Memory Architecture** (a shared LanceDB knowledge graph).
+When an agent is initialized, it is granted read/write access to its own personal memory namespace (e.g., `namespace: "global"`, `agent_name: "Security Sentinel"`). This gives the agent a persistent "Soul" independent of any specific project's `genesis-context.json`. As the agent encounters novel solutions or is corrected on domain-specific facts across different projects, it writes those revelations into NeuroStrata, actively increasing its competency and evolving its heuristic frameworks over time.
 
 ## 3. Directory Structure
 

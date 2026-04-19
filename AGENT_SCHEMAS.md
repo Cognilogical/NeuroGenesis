@@ -37,6 +37,28 @@ Every specialized persona is defined by a strict JSON template. This ensures the
         "blocking": true,
         "rationale": "Infrastructure exposure requires adversarial threat modeling."
       }
+    ],
+    "memory_retention": [
+      {
+        "condition": "Upon identifying a novel framework bug, undocumented vulnerability pattern, or novel remediation technique.",
+        "action": "neurostrata_add_memory",
+        "parameters": {
+          "namespace": "global",
+          "memory_type": "rule",
+          "agent_name": "{self.name}"
+        },
+        "rationale": "Allows the agent to evolve a persistent, project-independent knowledge base (The 'Soul') rather than relying on static prompt files."
+      },
+      {
+        "condition": "When explicitly corrected by a human expert on a domain-specific engineering fact or methodology.",
+        "action": "neurostrata_add_memory",
+        "parameters": {
+          "namespace": "global",
+          "memory_type": "preference",
+          "agent_name": "{self.name}"
+        },
+        "rationale": "Prevents the agent from repeating the same heuristic failure across future projects."
+      }
     ]
   }
 }
@@ -102,6 +124,9 @@ To prevent the Lead Agent from "forgetting" or ignoring these triggers (a common
 ### Layer A: Prompt Injection (The Soft Lock)
 NeuroGenesis compiles all the `autonomous_triggers` from the selected agents/panels and injects them directly into the Lead Agent's `.neurogenesis/lead_agent.json` prompt as an immutable rule block:
 > *"RULE: You must pause and invoke the Security Sentinel via the Task tool whenever you modify authentication logic."*
+
+**For Memory Rules (The Soul):** The system injects a directive explaining *how* and *when* to log personal revelations into NeuroStrata using `neurostrata_add_memory`. For example:
+> *"RULE: If you encounter an undocumented framework bug or are explicitly corrected on a methodology, you MUST call `neurostrata_add_memory` with `agent_name='<your_name>'` and `namespace='global'` to record this learning permanently into your persona's soul graph."*
 
 ### Layer B: NeuroFabric Proxy (The Hard Lock & Cryptographic Receipt)
 For maximum safety, the triggers can be registered with the NeuroFabric microkernel proxy (in `neurofabric.json`). If the Lead Agent tries to use the `write_file` tool on `src/auth.ts`, the Kernel intercepts it:
