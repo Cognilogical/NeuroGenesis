@@ -1,9 +1,14 @@
 # NeuroGenesis Architecture & Design Document
 
-## 1. Overview
-**NeuroGenesis** is the "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. Unlike standard CLI AI assistants that act as generic coding helpers, NeuroGenesis initializes a highly specialized, context-aware AI swarm specifically tailored to the project's risk profile, domain, and technology stack.
+## 1. Overview & Elevator Pitch
 
-Its primary goal is to shift the AI from a "generic helper" to a "Project-Specific Lead Agent" and configure the execution environment to interface securely with the NeuroFabric microkernel.
+**"The `create-react-app` for the Neuro Agentic AI OS."**
+
+**NeuroGenesis** is the "Day 0" Cognitive Bootstrapper. Just as `create-react-app` or `npm create vite` scaffolds a ready-to-code frontend project, NeuroGenesis scaffolds a **ready-to-think AI swarm** embedded directly into your new codebase.
+
+Unlike standard CLI AI assistants that act as generic coding helpers, NeuroGenesis initializes a highly specialized, context-aware AI team specifically tailored to the project's risk profile, domain, and technology stack. 
+
+Its primary goal is to shift the AI from a "generic helper" to a "Project-Specific Lead Agent", scaffold the initial directory structure, and configure the execution environment to interface securely with the NeuroFabric microkernel from the very first terminal command.
 
 ## 2. Core Pillars & Workflow
 
