@@ -7,8 +7,15 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 1. **Naming Convention:** All generated agents MUST be named using the format: `neuro-{project}-{specialization/role}.md` (e.g., `neuro-hft-financial_auditor.md`).
 2. **Global Storage:** All agents MUST be stored in the user-level directory (e.g., `~/.config/neurogenesis/agents/`) so they are available globally across other projects.
 3. **Tool Agnosticism:** Agents, skills, and commands must be stored in the most generic, open format possible (Standard Markdown with YAML frontmatter).
-4. **Symlinking:** If a specific IDE or tool requires a local file (e.g., `.cursorrules`, `.clauderc`), do NOT duplicate the agent. Create a symlink (`ln -s`) from the global user-level agent file to the tool's expected local path.
+4. **Symlinking & Platform Fallbacks:** If a specific IDE or tool requires a local file (e.g., `.cursorrules`, `.clauderc`), prefer creating a symlink (`ln -s`) from the global user-level agent file to the tool's expected local path. **CRITICAL:** If running on Windows without symlink privileges, gracefully fallback to a hard copy and document the sync requirement.
 5. **Model Recommendations (Metadata):** Every agent MUST include a YAML frontmatter block with a `recommended_models` array. Store generic model names *without* the provider prefix (e.g., `["claude-3-5-sonnet", "o3-mini"]`, NOT `anthropic/claude-3-5-sonnet`). These represent the optimal cognitive match for the agent's role.
+6. **Concurrency & State Safety:** When creating or updating global agents, always use atomic write-and-rename operations or file locks to prevent corruption if multiple projects or OS agents attempt to modify the same persona concurrently.
+
+## Persona Memory (The Soul)
+Every generated agent prompt (`neuro-{project}-{role}.md`) MUST be injected with a "CORE DIRECTIVE: PERSONA MEMORY" section. This instructs the agent to:
+1. **Hydrate:** Pull its personal, project-agnostic heuristics from the NeuroStrata DB (`namespace="global"`, `query="<Agent_Name>"`) or a fallback markdown file on every invocation.
+2. **Prune & Migrate (Cognitive Compaction):** Actively summarize and decay outdated heuristics to prevent unbounded memory growth and context window bloat. Migrate markdown fallbacks into the NeuroStrata DB when available.
+3. **Learn:** Store any novel heuristics or framework bugs encountered back into the global DB, stripped of user or project tags.
 
 ---
 
