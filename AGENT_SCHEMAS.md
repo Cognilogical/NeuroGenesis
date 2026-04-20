@@ -117,19 +117,13 @@ A **Panel** is a pre-defined, domain-specific ensemble of agents convened for br
 
 ## 3. How the Rules are Enforced
 
-To prevent the Lead Agent from "forgetting" or ignoring these triggers (a common problem with LLM instruction drift), the enforcement happens at two layers:
+To prevent the Lead Agent from "forgetting" or ignoring these triggers (a common problem with LLM instruction drift), the enforcement happens purely via deterministic Prompt Compilation.
 
-### Layer A: Prompt Injection (The Soft Lock)
-NeuroGenesis compiles all the `autonomous_triggers` from the selected agents/panels and injects them directly into the Lead Agent's `.neurogenesis/lead_agent.json` prompt as an immutable rule block:
+### Prompt Injection (The Soft Lock)
+NeuroGenesis compiles all the `autonomous_triggers` from the selected agents/panels and injects them directly into the Lead Agent's `.cursorrules` prompt as an immutable rule block:
 > *"RULE: You must pause and invoke the Security Sentinel via the Task tool whenever you modify authentication logic."*
 
 **For Memory Rules (The Soul):** The system injects a directive explaining *what* and *when* to log personal revelations, categorized appropriately. It deliberately omits *how* to save it, deferring to the memory module's injected tool instructions to prevent conflicting syntax rules. For example:
 > *"RULE: If you encounter an undocumented framework bug or are explicitly corrected on a methodology, you MUST use your provided memory tools to permanently record this learning. Categorize it as a 'global persona rule' so it applies to all future projects. (Refer to your memory system instructions for the specific tool and syntax)."*
 
-### Layer B: Neuro System (The Hard Lock & Cryptographic Receipt)
-For maximum safety, the triggers can be registered with the Neuro microkernel system (in `swarm.json`). If the Lead Agent tries to use the `write_file` tool on `src/auth.ts`, the Kernel intercepts it:
-> *"PROXY REJECT: Write operation blocked. Condition 'auth_modification' triggered. You must present a cryptographically verified approval receipt from the Security Sentinel agent process before this write is permitted."*
-
-Because the kernel demands a system-verified receipt (e.g., an authentic Task ID or signed JSON output from the actual execution of the specialist agent), **the Lead Agent is physically incapable of "hallucinating" or simulating the panel's response.** It cannot just write "The Security Sentinel said it is okay." The system enforces actual, independent execution of the required agents.
-
-This combination guarantees that expert reviews and panels are automatically summoned when needed, bridging the gap between an AI assistant and a true, self-governing Agentic OS.
+Because these Soft Locks are compiled and placed immediately above the Global Invariants at the absolute bottom of the `.cursorrules` file, the LLM's recency bias heavily weights them, ensuring maximum compliance without requiring a complex runtime security proxy.

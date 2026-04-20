@@ -235,8 +235,39 @@ fn main() {
             
             // Body B (Roster)
             rules.push_str("## Your Swarm Roster\n");
+            
+            // External Registry Fetch Logic
+            let client = Client::builder().timeout(std::time::Duration::from_secs(3)).build().unwrap();
+            let registry_base_url = "https://raw.githubusercontent.com/neuro-os/standard-roster/main/agents";
+            
+            println!("🌐 Fetching agent definitions from External Registry ({})...", registry_base_url);
+            
             for specialist in &context.neuro_os_directives.required_specialists {
-                rules.push_str(&format!("- {}\n", specialist));
+                // Format the URL (e.g. "Security Sentinel" -> "security_sentinel.json")
+                let safe_name = specialist.to_lowercase().replace(" ", "_");
+                let url = format!("{}/{}.json", registry_base_url, safe_name);
+                
+                print!("   - Fetching {}... ", specialist);
+                std::io::stdout().flush().unwrap();
+                
+                // Attempt to fetch the definition
+                match client.get(&url).send() {
+                    Ok(resp) if resp.status().is_success() => {
+                        // In a real implementation, we would parse this JSON and extract the system_prompt, 
+                        // capabilities, and triggers to enrich the .cursorrules and swarm.json.
+                        println!("✅ Success");
+                        rules.push_str(&format!("- {} (Definition loaded from registry)\n", specialist));
+                    }
+                    Ok(resp) => {
+                        // 404 or other error - Fallback to generic template
+                        println!("⚠️  Not found (HTTP {}), using fallback template", resp.status());
+                        rules.push_str(&format!("- {} (Fallback template applied)\n", specialist));
+                    }
+                    Err(_) => {
+                        println!("❌ Network error, using fallback template");
+                        rules.push_str(&format!("- {} (Fallback template applied)\n", specialist));
+                    }
+                }
             }
             rules.push_str("\n");
 

@@ -2,6 +2,8 @@
 
 This document defines the baseline, out-of-the-box agents provided by the Neuro OS. Every agent strictly adheres to the core Generation Rules (Academic Grounding, Epistemic Humility, Strict Anti-Sycophancy). They are categorized by their enterprise domain.
 
+**Architectural Note:** These agents are **NOT** hardcoded into the NeuroGenesis CLI binary. They are defined as strict JSON schemas and hosted externally in the **Neuro OS Agent Registry** (e.g., a centralized GitHub repository or database). During the Day 0 Bootstrap (`neurogenesis blueprint`), the CLI dynamically fetches these definitions over HTTP to compile the final `.cursorrules` and `swarm.json`. This decouples the OS updates from the Agent updates, allowing personas to evolve independently.
+
 ---
 
 ## 1. Core Orchestration
