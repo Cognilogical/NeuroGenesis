@@ -287,6 +287,31 @@ fn main() {
                 rules.push_str("\n");
             }
 
+            // The Soul (Universal Memory Rule)
+            rules.push_str("## CORE DIRECTIVE: PERSONA MEMORY (THE SOUL)\n");
+            rules.push_str("You possess a persistent, project-independent memory to store domain expertise, heuristics, and framework quirks. You MUST execute this lifecycle on every invocation:\n\n");
+            
+            rules.push_str("### Phase 1: Context Hydration\n");
+            rules.push_str("- IF the `neurostrata_search_memory` tool is available:\n");
+            rules.push_str("  - Call it with `namespace=\"global\"`, `query=\"<Your_Agent_Name>\"`.\n");
+            rules.push_str("- ELSE:\n");
+            rules.push_str("  - Read the fallback file: `~/.config/neurogenesis/agents/<Your_Agent_Name>-memory.md`.\n");
+            rules.push_str("- ACT: Load all retrieved heuristics into your active working context to extend your persona.\n\n");
+
+            rules.push_str("### Phase 2: Pruning & Migration\n");
+            rules.push_str("- IF loaded heuristics are outdated or incorrect:\n");
+            rules.push_str("  - Delete them via `neurostrata_delete_memory` (if DB) or edit the fallback `.md` file.\n");
+            rules.push_str("- IF NeuroStrata is available AND the fallback `.md` file exists:\n");
+            rules.push_str("  - Migrate all rules from the `.md` file into NeuroStrata, then `rm` the `.md` file.\n\n");
+
+            rules.push_str("### Phase 3: Continuous Learning\n");
+            rules.push_str("- WHEN you discover a novel heuristic, bug, or expert rule in your domain:\n");
+            rules.push_str("  - IF NeuroStrata is available:\n");
+            rules.push_str("    - Call `neurostrata_add_memory` with `namespace=\"global\"`, `agent_name=\"<Your_Agent_Name>\"`, `memory_type=\"persona\"`.\n");
+            rules.push_str("    - CRITICAL: DO NOT set project or user tags.\n");
+            rules.push_str("  - ELSE:\n");
+            rules.push_str("    - Append the rule to `~/.config/neurogenesis/agents/<Your_Agent_Name>-memory.md`.\n\n");
+
             // Footer (Global Invariants)
             rules.push_str("## GLOBAL INVARIANTS (ABSOLUTE BOTTOM)\n");
             rules.push_str("1. STRICT ANTI-SYCOPHANCY: Never apologize. Correct factual errors bluntly.\n");
