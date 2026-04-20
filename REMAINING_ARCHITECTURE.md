@@ -21,14 +21,14 @@ The engine uses a deterministic, bottom-heavy compilation strategy based on **LL
 ---
 
 ## Proposal 2: The Tool Distribution Matrix (Principle of Least Privilege)
-*Problem:* If every agent gets `bash` and `write_file`, the security model collapses. We must distribute MCP tools securely and enforce strict proxy-level restrictions.
+*Problem:* If every agent gets `bash` and `write_file`, the security model collapses. We must distribute MCP tools securely and enforce strict system-level restrictions.
 
 **Design:**
-Every tool invocation routes through the NeuroFabric Proxy, which enforces **Strict Command Allowlists** mathematically defined per role. Agents cannot bypass these allowlists.
+Every tool invocation routes through the Neuro System, which enforces **Strict Command Allowlists** mathematically defined per role. Agents cannot bypass these allowlists.
 
 *   **The Lead Agent (Context Master):** 
-    *   *Gets:* `nf_write_file` (gated by proxy), `nf_execute_bash` (gated by proxy), `Task` (to spawn subagents), `neurostrata_add_memory`, `nf_create_issue`.
-    *   *Proxy Allowlist (Bash):* `git`, `npm`, `tsc`, `pytest`, `ls`, `grep` (only safe project commands).
+    *   *Gets:* `nf_write_file` (gated by system), `nf_execute_bash` (gated by system), `Task` (to spawn subagents), `neurostrata_add_memory`, `nf_create_issue`.
+    *   *System Allowlist (Bash):* `git`, `npm`, `tsc`, `pytest`, `ls`, `grep` (only safe project commands).
     *   *Restricted:* Cannot run arbitrary system commands (`rm -rf`, `curl`, `wget`). Cannot read CVE databases or perform isolated math verification natively.
 *   **Security Sentinel:** 
     *   *Gets:* `nf_read_file`, `nf_search_code`, `webfetch` (to check live CVE databases/OWASP), `neurostrata_add_memory`.
@@ -38,7 +38,7 @@ Every tool invocation routes through the NeuroFabric Proxy, which enforces **Str
     *   *Restricted:* NO `nf_write_file`. NO `nf_execute_bash`.
 *   **The Naysayer / QA:**
     *   *Gets:* `nf_read_file`, `nf_execute_bash` (strictly limited to read-only profiling tools, e.g., `curl`, `ab`, `pytest`).
-    *   *Proxy Allowlist (Bash):* `curl`, `ab`, `pytest`, `wrk`. No write access to filesystem via bash.
+    *   *System Allowlist (Bash):* `curl`, `ab`, `pytest`, `wrk`. No write access to filesystem via bash.
 
 ---
 
@@ -51,9 +51,9 @@ We implement a **Standard MCP Task Interface** backed by **Adapter Shell Scripts
 1.  **The LLM Interface (MCP Tools):** 
     The Lead Agent is only given generic OS tools: `nf_issue_create`, `nf_issue_update`, `nf_issue_list`. It never knows the word "BeadBoard" or "Jira".
     *Payload:* `{"title": "Setup DB", "description": "...", "priority": "high"}`
-4.  **The Adapter Layer (NeuroFabric Proxy):**
-    When the Kernel intercepts `nf_issue_create`, it delegates the execution to a configurable shell script located in `.neurofabric/adapters/issue_create.sh`.
-    **CRITICAL SECURITY ENFORCEMENT:** Passing data via CLI arguments or environment variables creates a severe command injection vulnerability. The proxy MUST pipe the raw JSON payload strictly via `stdin`, forcing the shell script to parse it safely.
+4.  **The Adapter Layer (Neuro System):**
+    When the Kernel intercepts `nf_issue_create`, it delegates the execution to a configurable shell script located in `.swarm/adapters/issue_create.sh`.
+    **CRITICAL SECURITY ENFORCEMENT:** Passing data via CLI arguments or environment variables creates a severe command injection vulnerability. The system MUST pipe the raw JSON payload strictly via `stdin`, forcing the shell script to parse it safely.
 5.  **The Default Implementation:**
     Out of the box, `issue_create.sh` is a wrapper around `bd` that reads JSON from `stdin` using `jq`:
     ```bash

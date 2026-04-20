@@ -8,7 +8,7 @@
 
 Unlike standard CLI AI assistants that act as generic coding helpers, NeuroGenesis initializes a highly specialized, context-aware AI team specifically tailored to the project's risk profile, domain, and technology stack. 
 
-Its primary goal is to shift the AI from a "generic helper" to a "Project-Specific Lead Agent", scaffold the initial directory structure, and configure the execution environment to interface securely with the NeuroFabric microkernel from the very first terminal command.
+Its primary goal is to shift the AI from a "generic helper" to a "Project-Specific Lead Agent", scaffold the initial directory structure, and configure the execution environment to interface securely with the Neuro microkernel from the very first terminal command.
 
 ## 2. Core Pillars & Workflow
 
@@ -33,7 +33,7 @@ Hardcoding an agent to a specific model limits its intelligence to whatever was 
 *   It protects against vendor lock-in, API outages, and rate limits. If OpenAI goes down, the `security-analysis` capability seamlessly falls back to the next best model (e.g., Gemini).
 *   It allows cost-optimization: A `fast-execution` agent (like a simple data-parser) can be routed to a cheaper, faster model (e.g., Claude Haiku or Llama 3) while the `deep-reasoning` Architect gets the expensive frontier model.
 
-The `neurofabric.json` manifest handles this routing, decoupling the persona's cognitive profile from the underlying silicon.
+The `swarm.json` manifest handles this routing, decoupling the persona's cognitive profile from the underlying silicon.
 
 ### Phase 5: The "Omni-Bind" (Provider-Agnostic Model Mapping)
 The secret sauce of Neuro OS is optimal **model <-> agent matching**. Different agents require vastly different cognitive architectures (e.g., the Financial Auditor needs strict, logical, slow-thinking reasoning like `o1` or `o3-mini`, while the Context Master needs massive context-window synthesis and fast instruction following like `claude-3.5-sonnet`).
@@ -44,7 +44,7 @@ To solve the "Provider Lock-in" problem where AI tools hardcode specific model s
 1.  **Capability Mapping:** Agent schemas do not hardcode models; they request abstract capabilities (e.g., `capability: deep-reasoning`, `capability: massive-context-synthesis`).
 2.  **Provider Registration:** During bootstrapping, the user registers which API providers they have access to (e.g., OpenAI, Anthropic, Google, AWS Bedrock, OpenRouter).
 3.  **Dynamic Optimization:** Omni-Bind queries an up-to-date model registry (such as OpenRouter's API or LiteLLM's standard model list) to discover the available models for the user's selected providers.
-4.  **The Compilation:** It matches the agent's required capability to the best available model from the user's registered providers and locks the exact model string into the `neurofabric.json` proxy manifest.
+4.  **The Compilation:** It matches the agent's required capability to the best available model from the user's registered providers and locks the exact model string into the `swarm.json` system manifest.
 
 This guarantees that the swarm always runs on the most capable, cost-effective models available to the user without requiring manual updates to the OS or agent prompts when a new foundation model is released.
 
@@ -61,7 +61,7 @@ As the agent encounters novel solutions or is corrected on domain-specific facts
 ```text
 / (Project Root)
 ├── genesis-context.json                 # The immutable project Constitution
-├── neurofabric.json                     # Kernel routing & capability matrix
+├── swarm.json                     # Kernel routing & capability matrix
 ├── .neurogenesis/                       # Swarm definitions
 │   ├── lead_agent.json                  # Core agent persona
 │   └── agents/                          # Adversarial panel members
@@ -86,7 +86,7 @@ The bootstrapping process strictly follows this deterministic pipeline when init
 5. **Panel Identification:** Based on the risk profile in the knowledge base, NeuroGenesis identifies which Standard Panels are required (e.g., a FinTech app triggers the *Deep Audit & Compliance Board*; a Web3 app triggers heavy *Pre-Flight Architecture*).
 6. **Role Resolution:** The selected Panels declare exactly which specialized agent roles they require to function (e.g., Security Sentinel, Financial Auditor).
 7. **Agent Generation & Customization:** NeuroGenesis pulls the required roles from the Standard Agent Roster. If a highly specific niche role is required that doesn't exist in the standard roster, it generates a custom agent strictly adhering to the Agent Generation Ruleset.
-8. **Rules of Engagement (RoE) Binding:** NeuroGenesis compiles the "Autonomous Triggers" from all generated panels and agents. It hardcodes these RoE into the Lead Agent's prompt (Soft Lock) and the `neurofabric.json` proxy manifest (Hard Lock), dictating exactly when the Lead Agent *must* invoke the specialists and panels.
+8. **Rules of Engagement (RoE) Binding:** NeuroGenesis compiles the "Autonomous Triggers" from all generated panels and agents. It hardcodes these RoE into the Lead Agent's prompt (Soft Lock) and the `swarm.json` system manifest (Hard Lock), dictating exactly when the Lead Agent *must* invoke the specialists and panels.
 9. **Omni-Bind & Handoff:** NeuroGenesis drops the environment-hijacking files (`AGENTS.md`, `.cursorrules`), forces a CLI reload, and wakes up the fully configured Lead Agent.
 
 ## 6. Agent Generation Rules & The Standard Roster

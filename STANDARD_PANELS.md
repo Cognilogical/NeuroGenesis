@@ -55,7 +55,7 @@ Neuro OS panels are not just "multiple prompts running at once." They are strict
     *   Modification of CI/CD configuration files (e.g., `.github/workflows`, `Jenkinsfile`).
     *   When the Lead Agent executes a command indicating a release sequence (e.g., `git push origin release/*`, `npm run build:prod`).
 *   **Voting Dynamics:**
-    *   **Unanimous Consent Required:** Every member must return a clean, cryptographically verified approval JSON. A single "Block" vote from *any* member halts the deployment proxy.
+    *   **Unanimous Consent Required:** Every member must return a clean, cryptographically verified approval JSON. A single "Block" vote from *any* member halts the deployment system.
 
 ---
 

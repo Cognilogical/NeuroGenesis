@@ -32,7 +32,7 @@ struct Cli {
 enum Commands {
     /// Initialize a new NeuroGenesis project with a Socratic interview
     Init,
-    /// Compile the genesis-context.json into the Swarm Blueprint (.cursorrules and neurofabric.json)
+    /// Compile the genesis-context.json into the Swarm Blueprint (.cursorrules and swarm.json)
     Blueprint,
     /// Discover available models from providers to configure Omni-Bind routing
     OmniBind,
@@ -205,14 +205,10 @@ fn main() {
                 }
             };
 
-            // 1. Generate neurofabric.json (Proxy Manifest)
-            let neurofabric_manifest = serde_json::json!({
+            // 1. Generate swarm.json (Swarm Definition)
+            let swarm_manifest = serde_json::json!({
                 "project": context.project_name,
                 "version": "1.0.0",
-                "proxy_rules": {
-                    "allowlist_commands": ["git", "npm", "cargo", "pytest", "ls", "grep"],
-                    "require_approval_for": ["rm", "DROP", "DELETE"]
-                },
                 "swarm": {
                     "specialists": context.neuro_os_directives.required_specialists,
                     "panels": context.neuro_os_directives.required_panels
@@ -220,9 +216,9 @@ fn main() {
                 "tracker_adapter": "beadboard"
             });
 
-            let mut nf_file = File::create("neurofabric.json").expect("Failed to create neurofabric.json");
-            nf_file.write_all(serde_json::to_string_pretty(&neurofabric_manifest).unwrap().as_bytes()).unwrap();
-            println!("✅ Generated neurofabric.json (Proxy Manifest)");
+            let mut nf_file = File::create("swarm.json").expect("Failed to create swarm.json");
+            nf_file.write_all(serde_json::to_string_pretty(&swarm_manifest).unwrap().as_bytes()).unwrap();
+            println!("✅ Generated swarm.json (Swarm Definition)");
 
             // 2. Generate .cursorrules (The Compiled Prompt)
             let mut rules = String::new();

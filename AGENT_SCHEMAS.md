@@ -2,13 +2,13 @@
 
 This document defines the underlying JSON/YAML templates used to construct individual agents and entire review panels.
 
-A critical evolution from ARC-7 is **Autonomous Invocation**. Instead of relying on a human to manually type `/ARC-7` to summon a panel, the Neuro OS embeds **Triggers** directly into the Lead Agent's environment and the NeuroFabric proxy. When specific conditions are met (e.g., modifying an authentication module, finalizing a database schema), the Lead Agent is *forced* by the system rules to invoke a specialist or convene a full panel before proceeding.
+A critical evolution from ARC-7 is **Autonomous Invocation**. Instead of relying on a human to manually type `/ARC-7` to summon a panel, the Neuro OS embeds **Triggers** directly into the Lead Agent's environment and the Neuro system. When specific conditions are met (e.g., modifying an authentication module, finalizing a database schema), the Lead Agent is *forced* by the system rules to invoke a specialist or convene a full panel before proceeding.
 
 ---
 
 ## 1. The Agent Template (`agent_schema.json`)
 
-Every specialized persona is defined by a strict JSON template. This ensures they are machine-readable and map perfectly to the NeuroFabric Capability Matrix.
+Every specialized persona is defined by a strict JSON template. This ensures they are machine-readable and map perfectly to the Neuro Capability Matrix.
 
 ```json
 {
@@ -63,7 +63,7 @@ Every specialized persona is defined by a strict JSON template. This ensures the
 ```
 
 ### 1.1 Trigger Anatomy
-*   **`condition`**: The specific semantic trigger injected into the Lead Agent's prompt or monitored by the proxy.
+*   **`condition`**: The specific semantic trigger injected into the Lead Agent's prompt or monitored by the system.
 *   **`action`**: What the Lead Agent must do (e.g., `require_specialist_review`).
 *   **`blocking`**: If `true`, the Lead Agent cannot execute the change (via bash or file write) until it receives a positive JSON response from the specialist.
 *   **`rationale`**: Explains *why* the trigger exists, ensuring the LLM understands the context of the rule.
@@ -126,10 +126,10 @@ NeuroGenesis compiles all the `autonomous_triggers` from the selected agents/pan
 **For Memory Rules (The Soul):** The system injects a directive explaining *what* and *when* to log personal revelations, categorized appropriately. It deliberately omits *how* to save it, deferring to the memory module's injected tool instructions to prevent conflicting syntax rules. For example:
 > *"RULE: If you encounter an undocumented framework bug or are explicitly corrected on a methodology, you MUST use your provided memory tools to permanently record this learning. Categorize it as a 'global persona rule' so it applies to all future projects. (Refer to your memory system instructions for the specific tool and syntax)."*
 
-### Layer B: NeuroFabric Proxy (The Hard Lock & Cryptographic Receipt)
-For maximum safety, the triggers can be registered with the NeuroFabric microkernel proxy (in `neurofabric.json`). If the Lead Agent tries to use the `write_file` tool on `src/auth.ts`, the Kernel intercepts it:
+### Layer B: Neuro System (The Hard Lock & Cryptographic Receipt)
+For maximum safety, the triggers can be registered with the Neuro microkernel system (in `swarm.json`). If the Lead Agent tries to use the `write_file` tool on `src/auth.ts`, the Kernel intercepts it:
 > *"PROXY REJECT: Write operation blocked. Condition 'auth_modification' triggered. You must present a cryptographically verified approval receipt from the Security Sentinel agent process before this write is permitted."*
 
-Because the kernel demands a system-verified receipt (e.g., an authentic Task ID or signed JSON output from the actual execution of the specialist agent), **the Lead Agent is physically incapable of "hallucinating" or simulating the panel's response.** It cannot just write "The Security Sentinel said it is okay." The proxy enforces actual, independent execution of the required agents.
+Because the kernel demands a system-verified receipt (e.g., an authentic Task ID or signed JSON output from the actual execution of the specialist agent), **the Lead Agent is physically incapable of "hallucinating" or simulating the panel's response.** It cannot just write "The Security Sentinel said it is okay." The system enforces actual, independent execution of the required agents.
 
 This combination guarantees that expert reviews and panels are automatically summoned when needed, bridging the gap between an AI assistant and a true, self-governing Agentic OS.

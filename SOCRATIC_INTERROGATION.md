@@ -47,7 +47,7 @@ The most important task of the Inquisitor is identifying **Critical Areas of Scr
 *   **User:** "I also need a script that generates an end-of-the-week inventory and profit report."
 *   **NeuroGenesis:** "Generating profit reports requires flawless financial calculations. I am flagging 'Financial Reporting' as a Critical Area. This means any code touching this report will automatically require a review from the Financial Auditor. Are there any specific accounting standards (e.g., GAAP) we need to adhere to for this report?"
 
-By explicitly identifying these areas with the user, the Inquisitor generates the specific semantic triggers that will be bound to the Lead Agent and the NeuroFabric Kernel.
+By explicitly identifying these areas with the user, the Inquisitor generates the specific semantic triggers that will be bound to the Lead Agent and the Neuro Kernel.
 
 ---
 

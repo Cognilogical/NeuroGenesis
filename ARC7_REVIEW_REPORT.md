@@ -33,14 +33,14 @@ Specifically: The cryptographic receipt mechanism is unspecified, Semantic Trigg
 ### RISK-001: Semantic Trigger Detection is an Unsolved Problem
 - **Severity:** Critical
 - **Source:** The Naysayer, The Architect
-- **Description:** The entire autonomous invocation system hinges on reliably detecting when the Lead Agent is "modifying authentication logic." The Soft Lock relies on the LLM self-policing (prone to instruction drift). The Hard Lock relies on the proxy pattern-matching file paths (e.g., blocking writes to `src/auth.ts`). If auth logic lives in `src/middleware/session.ts`, the proxy misses it. If detection fails, the entire enforcement layer is bypassed silently.
+- **Description:** The entire autonomous invocation system hinges on reliably detecting when the Lead Agent is "modifying authentication logic." The Soft Lock relies on the LLM self-policing (prone to instruction drift). The Hard Lock relies on the system pattern-matching file paths (e.g., blocking writes to `src/auth.ts`). If auth logic lives in `src/middleware/session.ts`, the system misses it. If detection fails, the entire enforcement layer is bypassed silently.
 - **Recommendation:** Do not rely solely on LLM semantic understanding or brittle regex paths. Define a two-tier system: (1) Fast path glob/regex, and (2) a lightweight classifier that reviews the diff *intent* before write operations.
 
 ### RISK-002: Cryptographic Receipt Mechanism is Completely Unspecified
 - **Severity:** Critical
 - **Source:** The Naysayer, The Architect, Creative Strategist
-- **Description:** The claim that the proxy demands a "cryptographically verified approval receipt" to prevent hallucinated approvals is the core security mechanism, but has zero specification. Who signs it? With what key? How does the proxy verify it came from an actual agent execution and not the Lead Agent crafting a fake JSON blob?
-- **Recommendation:** Design a concrete receipt protocol. Minimum viable: The NeuroFabric kernel generates a nonce before dispatching to the specialist; the specialist response includes the nonce; the kernel validates it. Define the `agent_message_envelope.json` schema.
+- **Description:** The claim that the system demands a "cryptographically verified approval receipt" to prevent hallucinated approvals is the core security mechanism, but has zero specification. Who signs it? With what key? How does the system verify it came from an actual agent execution and not the Lead Agent crafting a fake JSON blob?
+- **Recommendation:** Design a concrete receipt protocol. Minimum viable: The Neuro kernel generates a nonce before dispatching to the specialist; the specialist response includes the nonce; the kernel validates it. Define the `agent_message_envelope.json` schema.
 
 ### PERF-001: Missing end-to-end latency/cost budget per workflow
 - **Severity:** Critical
@@ -64,17 +64,17 @@ Specifically: The cryptographic receipt mechanism is unspecified, Semantic Trigg
 - **Description:** `genesis-context.json` is described as immutable, but projects pivot. If it's truly frozen, the swarm roster becomes stale. If a user just edits the file manually, the downstream agents might break.
 - **Recommendation:** Add a `schema_version` field and define a formal `genesis amend` ceremony: re-invoke the Socratic Inquisitor scoped to the changed dimension, and force a Pre-Flight Architecture Panel review of the delta.
 
-### PROD-004: Proxy enforcement is high-effort and may reduce activation
+### PROD-004: System enforcement is high-effort and may reduce activation
 - **Severity:** Major
 - **Source:** Product Visionary, Creative Strategist
 - **Description:** Immediate hard locks can feel punitive during onboarding and cause users to abandon the tool.
 - **Recommendation:** Stage enforcement: start with "Observe -> Warn -> Enforce" modes. Only escalate to "Hard Locks" for high-risk actions once the user trusts the system.
 
-### ARCH-003: No degraded-mode or fallback when NeuroFabric proxy is unavailable
+### ARCH-003: No degraded-mode or fallback when Neuro system is unavailable
 - **Severity:** Major
 - **Source:** The Architect
-- **Description:** If the NeuroFabric proxy crashes, the agent is completely lobotomized with zero capability (no native tools). This is a single point of failure that bricks the developer's environment.
-- **Recommendation:** Define operating modes: Full Enforcement, Soft-Only (proxy down, native tools restored, audit logged), and Emergency Bypass.
+- **Description:** If the Neuro system crashes, the agent is completely lobotomized with zero capability (no native tools). This is a single point of failure that bricks the developer's environment.
+- **Recommendation:** Define operating modes: Full Enforcement, Soft-Only (system down, native tools restored, audit logged), and Emergency Bypass.
 
 ### RISK-004: Lobotomy Strategy Assumes Controllable CLI Tool Internals
 - **Severity:** Major
@@ -86,7 +86,7 @@ Specifically: The cryptographic receipt mechanism is unspecified, Semantic Trigg
 
 ## What Was Done Well
 
-*   **Dual-Enforcement Model:** The Soft Lock (prompt) + Hard Lock (kernel proxy) is genuinely novel and addresses the critical LLM instruction-drift problem that plagues every other framework.
+*   **Dual-Enforcement Model:** The Soft Lock (prompt) + Hard Lock (kernel system) is genuinely novel and addresses the critical LLM instruction-drift problem that plagues every other framework.
 *   **Separation of Concerns in Memory:** Separating "what to remember" from "how to remember" (tool syntax) is excellent decoupling that prevents conflicting tool instructions.
 *   **Scientific Grounding:** The explicit citations of Du et al., Sharma et al., and Li et al. prove this is built on actual cognitive science research, not cargo-culting.
 *   **Socratic Inquisitor "Bucket Filling":** The approach of opening new conceptual dimensions rather than rejecting inputs is a sophisticated interview technique.
