@@ -1,8 +1,24 @@
 use clap::{Parser, Subcommand};
-use inquire::{Text, Select, MultiSelect, Confirm};
+use inquire::{Text, Select, Confirm};
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Write;
+use reqwest::blocking::Client;
+use std::collections::HashMap;
+
+// OpenRouter model fetching
+#[derive(Serialize, Deserialize, Debug)]
+struct OpenRouterModel {
+    id: String,
+    name: String,
+    context_length: u32,
+    architecture: Option<HashMap<String, serde_json::Value>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct OpenRouterResponse {
+    data: Vec<OpenRouterModel>,
+}
 
 #[derive(Parser)]
 #[command(name = "neurogenesis")]
@@ -18,6 +34,8 @@ enum Commands {
     Init,
     /// Compile the genesis-context.json into the Swarm Blueprint (.cursorrules and neurofabric.json)
     Blueprint,
+    /// Discover available models from providers to configure Omni-Bind routing
+    OmniBind,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -246,6 +264,40 @@ fn main() {
             println!("✅ Generated .cursorrules (Compiled System Prompt)");
 
             println!("\n🚀 Swarm Blueprinting complete! Your IDE is now bound to the Neuro OS.");
+        }
+        Commands::OmniBind => {
+            println!("🌐 Fetching latest models from OpenRouter (Omni-Bind Resolver)...");
+
+            let client = Client::new();
+            match client.get("https://openrouter.ai/api/v1/models").send() {
+                Ok(resp) => {
+                    if resp.status().is_success() {
+                        let result: OpenRouterResponse = resp.json().expect("Failed to parse OpenRouter JSON");
+                        println!("✅ Fetched {} models.\n", result.data.len());
+                        
+                        println!("Finding optimal reasoning models (Capability: deep-reasoning)...");
+                        let reasoning_models: Vec<&OpenRouterModel> = result.data.iter()
+                            .filter(|m| m.id.contains("o1") || m.id.contains("o3") || m.id.contains("deepseek-r1"))
+                            .collect();
+
+                        for m in reasoning_models.iter().take(3) {
+                            println!("  - {} (ID: {}, Context: {} tokens)", m.name, m.id, m.context_length);
+                        }
+
+                        println!("\nFinding optimal fast synthesis models (Capability: massive-context-synthesis)...");
+                        let fast_models: Vec<&OpenRouterModel> = result.data.iter()
+                            .filter(|m| (m.id.contains("claude-3.5") || m.id.contains("gpt-4o")) && !m.id.contains("mini"))
+                            .collect();
+
+                        for m in fast_models.iter().take(3) {
+                            println!("  - {} (ID: {}, Context: {} tokens)", m.name, m.id, m.context_length);
+                        }
+                    } else {
+                        eprintln!("❌ Failed to fetch models: HTTP {}", resp.status());
+                    }
+                }
+                Err(e) => eprintln!("❌ Request failed: {}", e),
+            }
         }
     }
 }
