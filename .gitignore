@@ -3,3 +3,9 @@
 .dolt/
 *.db
 .beads-credential-key
+
+
+# Added by cargo
+
+/target
+.fastembed_cache/
