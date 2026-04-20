@@ -44,7 +44,7 @@ Once the interview concludes, execute the following:
    - If an existing global agent fits but needs additions for this project, modify the global agent file to include the new additions (evolving the persona).
 5. **Agent Generation:** Build out any missing agents based on scientific/research-backed evidence. Assign the `recommended_models` metadata. Map the optimal model to the user's specific API provider.
 6. **Panel Generation:** Build the identified panels. Define their governance, required assets, expected outputs, and the results they are responsible for.
-7. **Primary Agent Generation:** Build the primary orchestrator agent (e.g., `neuro-{project}-context_master.md`). This must be a generalist agent with broad skills related to the domain and general chat helper capabilities.
+7. **Primary Agent Generation:** Build the primary orchestrator agent (e.g., `neuro-{project}-context_master.md`). This must be a generalist agent with broad skills related to the domain and general chat helper capabilities. **CRITICAL:** Every generated orchestrator MUST implement the **Asymmetric Guard Pattern**. It must be paired with a secondary "Optimizer/Guard" agent. The Guard is *only* invoked on state-mutating actions (e.g., bash commands, file writes, code commits). The Orchestrator must be assigned a highly capable model, while the Guard MUST be pinned to a low-cost, high-speed, or local model. Include a "Circuit Breaker" rule (max 2 rejections before human arbitration).
 
 ---
 
@@ -63,7 +63,9 @@ Follow the exact same research and evidence-backed interview rules as `/neurogen
 ### `/neurogenesis map`
 **Trigger this command to optimize and update model routing for all global agents.**
 When invoked:
-1. Glob search the user-level directory for all agents matching `neuro-*.md`.
-2. Analyze each agent's defined role, function, and current `recommended_models` array.
-3. **Upgrade Check:** Evaluate if a newer version of the recommended model exists (e.g., if it recommends `claude-3-opus-20240229` but a newer version is available and beneficial for the role). Update the YAML metadata to the newer model if it improves performance.
-4. **Provider Mapping:** Ask the user what API provider(s) they are currently using. Find the best fit from their provider's catalog that matches the generic `recommended_models` and map/configure their local environment to use it.
+1. **Glob Search:** Glob search the user-level directory for all agents matching `neuro-*.md`.
+2. **Provider Auto-Discovery:** Attempt to auto-discover the user's configured LLM providers by inspecting common environmental config locations (e.g., `~/.config/opencode/`, `~/.claude.json`, environment variables like `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OLLAMA_API_BASE`). If discovery fails or is incomplete, explicitly ask the user which providers they have enabled.
+3. **Cost & Capability Analysis:** Fetch a live model pricing datasource (e.g., querying the OpenRouter API `https://openrouter.ai/api/v1/models` or referencing a known cost-map like LiteLLM's JSON list). Analyze each agent's defined role, function, and current `recommended_models` array against the discovered provider list and their associated costs.
+4. **Pinning the Guard:** For roles designated as the "Optimizer/Guard" (the Asymmetric Guard Pattern), you MUST prioritize mapping them to $0 local models (e.g., Ollama) if available, or the lowest-cost, fastest cloud models (e.g., `claude-3-5-haiku`, `gemini-1.5-flash`, `o3-mini`) from the user's available provider pool.
+5. **Upgrade Check:** Evaluate if a newer version of the recommended model exists (e.g., if it recommends `claude-3-opus-20240229` but a newer version is available and beneficial for the role).
+6. **User Approval (CRITICAL):** Formulate a complete proposed mapping of agents to specific models and providers. Present this list to the user along with a clear justification for each choice (specifically highlighting the cost optimization rationale for the Guard agent). **DO NOT APPLY THE MAPPING UNTIL THE USER EXPLICITLY APPROVES OR MODIFIES IT.**
