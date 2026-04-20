@@ -1,24 +1,15 @@
 use clap::{Parser, Subcommand};
 use inquire::{Text, Select, Confirm};
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::fs::File;
 use std::io::Write;
-use reqwest::blocking::Client;
-use std::collections::HashMap;
+use rust_embed::RustEmbed;
+use std::path::PathBuf;
 
-// OpenRouter model fetching
-#[derive(Serialize, Deserialize, Debug)]
-struct OpenRouterModel {
-    id: String,
-    name: String,
-    context_length: u32,
-    architecture: Option<HashMap<String, serde_json::Value>>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct OpenRouterResponse {
-    data: Vec<OpenRouterModel>,
-}
+#[derive(RustEmbed)]
+#[folder = "standard-agents/"]
+struct StandardAgents;
 
 #[derive(Parser)]
 #[command(name = "neurogenesis")]
@@ -32,7 +23,7 @@ struct Cli {
 enum Commands {
     /// Initialize a new NeuroGenesis project with a Socratic interview
     Init,
-    /// Compile the genesis-context.json into the Swarm Blueprint (.cursorrules and swarm.json)
+    /// Compile the genesis-context.json into the Swarm Blueprint (AGENTS.md and swarm.json)
     Blueprint,
     /// Discover available models from providers to configure Omni-Bind routing
     OmniBind,
@@ -86,8 +77,35 @@ struct GenesisContext {
     neuro_os_directives: NeuroOsDirectives,
 }
 
+fn sync_standard_agents() -> PathBuf {
+    let mut config_dir = dirs::config_dir().unwrap_or_else(|| {
+        eprintln!("❌ Error: Could not determine user config directory.");
+        std::process::exit(1);
+    });
+    config_dir.push("neurogenesis");
+    config_dir.push("agents");
+
+    if !config_dir.exists() {
+        fs::create_dir_all(&config_dir).expect("Failed to create ~/.config/neurogenesis/agents directory");
+    }
+
+    // Overwrite existing standard agents with bundled latest versions
+    for file in StandardAgents::iter() {
+        if let Some(embedded_file) = StandardAgents::get(file.as_ref()) {
+            let file_path = config_dir.join(file.as_ref());
+            let mut f = File::create(&file_path).expect("Failed to write standard agent file");
+            f.write_all(&embedded_file.data).expect("Failed to write data");
+        }
+    }
+
+    config_dir
+}
+
 fn main() {
     let cli = Cli::parse();
+    
+    // Always sync bundled agents to ~/.config/neurogenesis/agents/ on run
+    let agents_dir = sync_standard_agents();
 
     match &cli.command {
         Commands::Init => {
@@ -220,7 +238,7 @@ fn main() {
             nf_file.write_all(serde_json::to_string_pretty(&swarm_manifest).unwrap().as_bytes()).unwrap();
             println!("✅ Generated swarm.json (Swarm Definition)");
 
-            // 2. Generate .cursorrules (The Compiled Prompt)
+            // 2. Generate AGENTS.md (The Compiled System Prompt)
             let mut rules = String::new();
             rules.push_str(&format!("# Neuro OS Lead Agent for: {}\n\n", context.project_name));
             
@@ -236,37 +254,26 @@ fn main() {
             // Body B (Roster)
             rules.push_str("## Your Swarm Roster\n");
             
-            // External Registry Fetch Logic
-            let client = Client::builder().timeout(std::time::Duration::from_secs(3)).build().unwrap();
-            let registry_base_url = "https://raw.githubusercontent.com/neuro-os/standard-roster/main/agents";
-            
-            println!("🌐 Fetching agent definitions from External Registry ({})...", registry_base_url);
+            println!("🌐 Fetching agent definitions from local OS registry ({:?})...", agents_dir);
             
             for specialist in &context.neuro_os_directives.required_specialists {
-                // Format the URL (e.g. "Security Sentinel" -> "security_sentinel.json")
                 let safe_name = specialist.to_lowercase().replace(" ", "_");
-                let url = format!("{}/{}.json", registry_base_url, safe_name);
+                let file_path = agents_dir.join(format!("{}.json", safe_name));
                 
-                print!("   - Fetching {}... ", specialist);
+                print!("   - Loading {}... ", specialist);
                 std::io::stdout().flush().unwrap();
                 
-                // Attempt to fetch the definition
-                match client.get(&url).send() {
-                    Ok(resp) if resp.status().is_success() => {
-                        // In a real implementation, we would parse this JSON and extract the system_prompt, 
-                        // capabilities, and triggers to enrich the .cursorrules and swarm.json.
-                        println!("✅ Success");
-                        rules.push_str(&format!("- {} (Definition loaded from registry)\n", specialist));
-                    }
-                    Ok(resp) => {
-                        // 404 or other error - Fallback to generic template
-                        println!("⚠️  Not found (HTTP {}), using fallback template", resp.status());
+                if file_path.exists() {
+                    if let Ok(_content) = fs::read_to_string(&file_path) {
+                        println!("✅ Found");
+                        rules.push_str(&format!("- {} (Definition loaded from OS Registry)\n", specialist));
+                    } else {
+                        println!("⚠️  Read error, using fallback template");
                         rules.push_str(&format!("- {} (Fallback template applied)\n", specialist));
                     }
-                    Err(_) => {
-                        println!("❌ Network error, using fallback template");
-                        rules.push_str(&format!("- {} (Fallback template applied)\n", specialist));
-                    }
+                } else {
+                    println!("⚠️  Not found, using fallback template");
+                    rules.push_str(&format!("- {} (Fallback template applied)\n", specialist));
                 }
             }
             rules.push_str("\n");
@@ -286,45 +293,15 @@ fn main() {
             rules.push_str("2. EPISTEMIC HUMILITY: Only state what you know. Never guess dependencies.\n");
             rules.push_str("3. ANTI-SIMULATION: You cannot simulate specialists. You must physically invoke them or ask the user.\n");
 
-            let mut rules_file = File::create(".cursorrules").expect("Failed to create .cursorrules");
+            let mut rules_file = File::create("AGENTS.md").expect("Failed to create AGENTS.md");
             rules_file.write_all(rules.as_bytes()).unwrap();
-            println!("✅ Generated .cursorrules (Compiled System Prompt)");
+            println!("✅ Generated AGENTS.md (Compiled System Prompt for CLI Agents)");
 
-            println!("\n🚀 Swarm Blueprinting complete! Your IDE is now bound to the Neuro OS.");
+            println!("\n🚀 Swarm Blueprinting complete! Your project is now bound to the Neuro OS.");
         }
         Commands::OmniBind => {
-            println!("🌐 Fetching latest models from OpenRouter (Omni-Bind Resolver)...");
-
-            let client = Client::new();
-            match client.get("https://openrouter.ai/api/v1/models").send() {
-                Ok(resp) => {
-                    if resp.status().is_success() {
-                        let result: OpenRouterResponse = resp.json().expect("Failed to parse OpenRouter JSON");
-                        println!("✅ Fetched {} models.\n", result.data.len());
-                        
-                        println!("Finding optimal reasoning models (Capability: deep-reasoning)...");
-                        let reasoning_models: Vec<&OpenRouterModel> = result.data.iter()
-                            .filter(|m| m.id.contains("o1") || m.id.contains("o3") || m.id.contains("deepseek-r1"))
-                            .collect();
-
-                        for m in reasoning_models.iter().take(3) {
-                            println!("  - {} (ID: {}, Context: {} tokens)", m.name, m.id, m.context_length);
-                        }
-
-                        println!("\nFinding optimal fast synthesis models (Capability: massive-context-synthesis)...");
-                        let fast_models: Vec<&OpenRouterModel> = result.data.iter()
-                            .filter(|m| (m.id.contains("claude-3.5") || m.id.contains("gpt-4o")) && !m.id.contains("mini"))
-                            .collect();
-
-                        for m in fast_models.iter().take(3) {
-                            println!("  - {} (ID: {}, Context: {} tokens)", m.name, m.id, m.context_length);
-                        }
-                    } else {
-                        eprintln!("❌ Failed to fetch models: HTTP {}", resp.status());
-                    }
-                }
-                Err(e) => eprintln!("❌ Request failed: {}", e),
-            }
+            println!("🌐 Omni-Bind Resolver (Offline Mode)");
+            println!("Since the focus is on local orchestration, provider-agnostic model mapping can be implemented via an MCP server or proxy later.");
         }
     }
 }
