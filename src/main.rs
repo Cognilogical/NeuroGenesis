@@ -16,6 +16,8 @@ struct Cli {
 enum Commands {
     /// Initialize a new NeuroGenesis project with a Socratic interview
     Init,
+    /// Compile the genesis-context.json into the Swarm Blueprint (.cursorrules and neurofabric.json)
+    Blueprint,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -164,6 +166,86 @@ fn main() {
             println!("\n✨ Socratic Interrogation complete.");
             println!("Constitution successfully written to `{}`.", file_path);
             println!("The Neuro OS swarm is ready to be blueprinted.");
+        }
+        Commands::Blueprint => {
+            println!("⚙️ Compiling Neuro OS Blueprint from genesis-context.json...");
+
+            // Read the genesis context
+            let file_content = match std::fs::read_to_string("genesis-context.json") {
+                Ok(c) => c,
+                Err(_) => {
+                    eprintln!("❌ Error: genesis-context.json not found. Run `neurogenesis init` first.");
+                    std::process::exit(1);
+                }
+            };
+
+            let context: GenesisContext = match serde_json::from_str(&file_content) {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("❌ Error parsing genesis-context.json: {}", e);
+                    std::process::exit(1);
+                }
+            };
+
+            // 1. Generate neurofabric.json (Proxy Manifest)
+            let neurofabric_manifest = serde_json::json!({
+                "project": context.project_name,
+                "version": "1.0.0",
+                "proxy_rules": {
+                    "allowlist_commands": ["git", "npm", "cargo", "pytest", "ls", "grep"],
+                    "require_approval_for": ["rm", "DROP", "DELETE"]
+                },
+                "swarm": {
+                    "specialists": context.neuro_os_directives.required_specialists,
+                    "panels": context.neuro_os_directives.required_panels
+                },
+                "tracker_adapter": "beadboard"
+            });
+
+            let mut nf_file = File::create("neurofabric.json").expect("Failed to create neurofabric.json");
+            nf_file.write_all(serde_json::to_string_pretty(&neurofabric_manifest).unwrap().as_bytes()).unwrap();
+            println!("✅ Generated neurofabric.json (Proxy Manifest)");
+
+            // 2. Generate .cursorrules (The Compiled Prompt)
+            let mut rules = String::new();
+            rules.push_str(&format!("# Neuro OS Lead Agent for: {}\n\n", context.project_name));
+            
+            // Header (Persona)
+            rules.push_str("## Your Persona\nYou are the Context Master, the Lead Agent orchestrating this system. You delegate, verify, and track work via the Tracker-Agnostic API.\n\n");
+            
+            // Body A (Constitution)
+            rules.push_str("## Project Constitution\n");
+            rules.push_str(&format!("- Domain: {}\n", context.domain));
+            rules.push_str(&format!("- Risk Profile: {} ({})\n", context.risk_profile.level, context.risk_profile.security_posture));
+            rules.push_str(&format!("- Tech Stack: {} (Frontend), {} (Backend), {} (Database)\n\n", context.tech_stack.frontend, context.tech_stack.backend, context.tech_stack.database));
+            
+            // Body B (Roster)
+            rules.push_str("## Your Swarm Roster\n");
+            for specialist in &context.neuro_os_directives.required_specialists {
+                rules.push_str(&format!("- {}\n", specialist));
+            }
+            rules.push_str("\n");
+
+            // Rules of Engagement (Soft Locks)
+            if !context.critical_areas.is_empty() {
+                rules.push_str("## Rules of Engagement (Soft Locks)\n");
+                for area in &context.critical_areas {
+                    rules.push_str(&format!("- RULE: If {}, you MUST invoke the {}.\n", area.trigger_condition, area.required_specialist));
+                }
+                rules.push_str("\n");
+            }
+
+            // Footer (Global Invariants)
+            rules.push_str("## GLOBAL INVARIANTS (ABSOLUTE BOTTOM)\n");
+            rules.push_str("1. STRICT ANTI-SYCOPHANCY: Never apologize. Correct factual errors bluntly.\n");
+            rules.push_str("2. EPISTEMIC HUMILITY: Only state what you know. Never guess dependencies.\n");
+            rules.push_str("3. ANTI-SIMULATION: You cannot simulate specialists. You must physically invoke them or ask the user.\n");
+
+            let mut rules_file = File::create(".cursorrules").expect("Failed to create .cursorrules");
+            rules_file.write_all(rules.as_bytes()).unwrap();
+            println!("✅ Generated .cursorrules (Compiled System Prompt)");
+
+            println!("\n🚀 Swarm Blueprinting complete! Your IDE is now bound to the Neuro OS.");
         }
     }
 }
