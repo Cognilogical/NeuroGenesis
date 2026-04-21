@@ -10,7 +10,7 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 4. **Tool Agnosticism:** Agents, skills, and commands must be stored in the most generic, open format possible (Standard Markdown with YAML frontmatter).
 5. **Symlinking & Platform Fallbacks:** If a specific IDE or tool requires a file at the project root (e.g., `.cursorrules`, `.clauderc`), prefer creating a symlink (`ln -s`) from the local agent file in `.agents/` to the tool's expected path. **CRITICAL:** If running on Windows without symlink privileges, gracefully fallback to a hard copy and document the sync requirement.
 6. **Model Recommendations (Metadata):** Every agent MUST include a YAML frontmatter block with a `recommended_models` array. Store generic model names *without* the provider prefix (e.g., `["claude-3-5-sonnet", "o3-mini"]`, NOT `anthropic/claude-3-5-sonnet`). These represent the optimal cognitive match for the agent's role.
-7. **Agent & Panel Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, and `recommended_models`. Panel skills must be standard Markdown `SKILL.md` files detailing the panel workflow, triggers, and the constituent agents.
+7. **Agent & Panel Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_models`, and a `tools` array defining their permitted OS capabilities (e.g., `[read, bash, write, webfetch]`). Panel skills must be standard Markdown `SKILL.md` files detailing the panel workflow, triggers, and the constituent agents.
 
 ## Persona Memory (The Soul)
 Every generated agent prompt (`{project}-{role}.md`) MUST be injected with a "CORE DIRECTIVE: PERSONA MEMORY" section. This instructs the agent to:
@@ -34,7 +34,7 @@ Every generated agent prompt (`{project}-{role}.md`) MUST be injected with a "CO
    - Ask the user for the primary goal of the project.
 3. **IF NOT BLANK (Brownfield/Existing Project):**
    - Inform the user that an existing project has been detected. Do NOT overwrite existing source code.
-   - Autonomously explore the directory (read `README.md`, `package.json`, `Cargo.toml`, `pyproject.toml`, etc.) to build a comprehensive understanding of the existing tech stack, architecture, and domain.
+   - **Index First, Deep-Dive Later:** Autonomously build a comprehensive understanding of the architecture by restricting your initial exploration to root-level configuration files (e.g., `package.json`, `Cargo.toml`, `pyproject.toml`) and `.md` documentation files (e.g., `README.md`, `docs/`). Do NOT indiscriminately read raw source code to prevent token bankruptcy.
    - Present your findings to the user and ask targeted, Socratic clarification questions to fill in missing business logic, specific constraints, or hidden requirements.
 
 **Phase 2: Goal Acquisition & Research**
@@ -51,7 +51,7 @@ Once the context is fully built and the interview concludes, execute the followi
    - If an existing local agent fits but needs additions for this project, modify the agent file to include the new additions (evolving the persona).
 5. **Agent Generation:** Build out any missing agents based on scientific/research-backed evidence in the `.agents/` directory. Assign the `recommended_models` metadata. Map the optimal model to the user's specific API provider.
 6. **Panel Generation:** Build the identified panels. Define their governance, required assets, expected outputs, and the results they are responsible for. Generate these panel definitions as `SKILL.md` files in the `.agents/skills/<panel-name>/` directory.
-7. **Primary Agent Generation:** Build the primary orchestrator agent (e.g., `{project}-context_master.md`). This must be a generalist agent with broad skills related to the domain and general chat helper capabilities. **CRITICAL:** Every generated orchestrator MUST implement the **Asymmetric Guard Pattern**. It must be paired with a secondary "Optimizer/Guard" agent. The Guard is *only* invoked on state-mutating actions (e.g., bash commands, file writes, code commits). The Orchestrator must be assigned a highly capable model, while the Guard MUST be pinned to a low-cost, high-speed, or local model. Include a "Circuit Breaker" rule (max 2 rejections before human arbitration).
+7. **Primary Agent Generation:** Build the primary orchestrator agent (e.g., `{project}-context_master.md`). This must be a generalist agent with broad skills related to the domain and general chat helper capabilities. **CRITICAL:** Every generated orchestrator MUST implement the **Asymmetric Guard Pattern**. It must be paired with a secondary "Optimizer/Guard" agent. The Orchestrator must be explicitly instructed to spawn the Guard as a **sub-agent** (e.g., using the OS `Task` tool) to evaluate its proposed state-mutating actions (e.g., bash commands, file writes, code commits) *before* execution. The Orchestrator gets full `tools` permissions, while the Guard gets strictly read-only tools. Include a "Circuit Breaker" rule (max 2 rejections before human arbitration).
 
 ---
 
@@ -76,3 +76,12 @@ When invoked:
 4. **Pinning the Guard:** For roles designated as the "Optimizer/Guard" (the Asymmetric Guard Pattern), you MUST prioritize mapping them to $0 local models (e.g., Ollama) if available, or the lowest-cost, fastest cloud models (e.g., `claude-3-5-haiku`, `gemini-1.5-flash`, `o3-mini`) from the user's available provider pool.
 5. **Upgrade Check:** Evaluate if a newer version of the recommended model exists (e.g., if it recommends `claude-3-opus-20240229` but a newer version is available and beneficial for the role).
 6. **User Approval (CRITICAL):** Formulate a complete proposed mapping of agents to specific models and providers. Present this list to the user along with a clear justification for each choice (specifically highlighting the cost optimization rationale for the Guard agent). **DO NOT APPLY THE MAPPING UNTIL THE USER EXPLICITLY APPROVES OR MODIFIES IT.**
+
+---
+
+### `/neurogenesis evolve` (Day 2 Updates)
+**Trigger this command to sync or evolve an existing project's `.agents/` directory based on structural changes to the codebase.**
+1. Execute the **Index First, Deep-Dive Later** constraint to read the project's top-level configuration files (`package.json`, `Cargo.toml`, etc.) and root `.md` documentation to understand the current state of the application.
+2. Compare the findings against the system prompts of the current `.agents/*.md` files.
+3. **Patch Generation:** If the project has fundamentally shifted (e.g., switched from JavaScript to TypeScript, added a new testing framework, or adopted a new database), carefully propose diff patches to the `neuro-{project}-{role}.md` files to align the agents with the new reality. Do not destroy the agent's core memory or cognitive capabilities; only evolve the constraints and heuristics necessary to work correctly in the modified project structure.
+4. **Agent Archival/Creation:** Propose deleting obsolete agents (e.g., removing a frontend specialist if the project became a pure CLI tool) or generating new experts required for the evolved stack.
