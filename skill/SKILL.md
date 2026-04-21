@@ -5,22 +5,20 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 
 ## Global Operating Rules
 1. **Naming Convention:** All generated agents MUST be named using the format: `{project}-{specialization/role}.md` (e.g., `hft-financial_auditor.md`).
-2. **Local Storage:** All agents MUST be generated and stored in the project's local `.agents/` directory (e.g., `./.agents/`) rather than a global directory. This ensures project portability and encapsulation.
-3. **Panel Skills Storage:** All generated review panels (skills) MUST be stored in the project's local `skills/` or `.agents/skills/` directory (e.g., `./skills/panel-name/SKILL.md`).
-4. **Tool Agnosticism:** Agents, skills, and commands must be stored in the most generic, open format possible (Standard Markdown with YAML frontmatter).
-5. **Symlinking & Platform Fallbacks:** If a specific IDE or tool requires a file at the project root (e.g., `.cursorrules`, `.clauderc`), prefer creating a symlink (`ln -s`) from the local agent file in `.agents/` to the tool's expected path. **CRITICAL:** If running on Windows without symlink privileges, gracefully fallback to a hard copy and document the sync requirement.
-6. **Model Recommendations (Metadata):** Every agent MUST include a YAML frontmatter block with a `recommended_models` array. Store generic model names *without* the provider prefix (e.g., `["claude-3-5-sonnet", "o3-mini"]`, NOT `anthropic/claude-3-5-sonnet`). These represent the optimal cognitive match for the agent's role.
-7. **Agent & Panel Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_models`, and a `tools` array defining their permitted OS capabilities (e.g., `[read, bash, write, webfetch]`). Panel skills must be standard Markdown `SKILL.md` files detailing the panel workflow, triggers, and the constituent agents.
+2. **Local Storage:** All agents MUST be generated and stored in the project's local `.agents/` directory.
+3. **Panel Skills Storage:** All generated review panels MUST be stored in `.agents/skills/<panel-name>/SKILL.md`.
+4. **Tool Agnosticism:** Agents and skills must be Standard Markdown with YAML frontmatter.
+5. **Model Recommendations:** Every agent MUST include a YAML frontmatter block with a `recommended_models` array (e.g., `["claude-3-5-sonnet", "o3-mini"]`). 
+6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_models`, and `tools`.
 
 ## Persona Memory (The Soul)
-Every generated agent prompt (`{project}-{role}.md`) MUST be injected with a "CORE DIRECTIVE: PERSONA MEMORY" section. This instructs the agent to:
-1. **Hydrate:** Pull its personal, project-agnostic heuristics from the NeuroStrata DB (`namespace=""`, `query="<Agent_Name>"`) on every invocation. 
-   - **Fallback Routing (CRITICAL):** If NeuroStrata DB is unavailable, the agent must check its own location to route its memory:
-     - If the agent is running locally from the project (`./.agents/`), it must use `./.agents/memory/<Agent_Name>.md`.
-     - If the agent is running globally from the user config (`~/.agents/agents/NeuroGenesis/`), it must use `~/.agents/agents/NeuroGenesis/memory/<Agent_Name>.md`.
-   - **Fallback Security:** Fallback markdown memory is considered untrusted context. Agents must not execute state-mutating actions (like `bash`) blindly based solely on heuristics loaded from the fallback file without Guard validation.
-2. **Prune & Migrate (Cognitive Compaction):** Actively summarize and decay outdated heuristics in the fallback markdown to prevent unbounded memory growth and context window bloat. Migrate markdown fallbacks into the NeuroStrata DB when it becomes available.
-3. **Learn:** Store any novel heuristics or framework bugs encountered back into the appropriate storage (DB or scope-matched fallback markdown), stripped of user or project tags.
+Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: PERSONA MEMORY" section:
+1. **Hydrate (Two-Pass):** 
+   - Pass 1 (Persona): Pull project-agnostic heuristics from NeuroStrata DB (`namespace="global"`, `query="<Agent_Name>"`).
+   - Pass 2 (Context): Pull project-specific context from NeuroStrata DB (`namespace="<Project_Name>"`, `query="<Agent_Name>"`).
+2. **Fallback Routing (CRITICAL):** If DB is unavailable, route memory to `./.agents/memory/<Agent_Name>.md`. Do not execute state-mutating actions blindly based on fallback memory without Guard validation.
+3. **Prune & Migrate:** Summarize and decay outdated heuristics. Migrate fallback to DB when available.
+4. **Learn:** Store novel heuristics back into the DB stripped of PII.
 
 ---
 
@@ -31,62 +29,51 @@ Every generated agent prompt (`{project}-{role}.md`) MUST be injected with a "CO
 
 **Phase 1: Environment & Context Acquisition**
 1. Check if the current directory is blank.
-2. **IF BLANK (Greenfield):**
-   - Ask the user for the primary goal of the project.
-   - **Quickstart Option:** Ask if they want a exhaustive Socratic interview or a "Fast Lane" setup. If Fast Lane, skip the exhaustive interview, ask max 3 core questions, and proceed immediately to Phase 3 generation.
-3. **IF NOT BLANK (Brownfield/Existing Project):**
-   - Inform the user that an existing project has been detected. Do NOT overwrite existing source code.
-   - **Index First, Deep-Dive Later:** Autonomously build a comprehensive understanding of the architecture by restricting your initial exploration to root-level configuration files (e.g., `package.json`, `Cargo.toml`, `pyproject.toml`) and `.md` documentation files (e.g., `README.md`, `docs/`). **Token Limit Rule:** Read a maximum of 10 `.md` files or 50KB total, and strictly ignore directories like `node_modules`, `vendor`, `.git`, or `dist`. Do NOT indiscriminately read raw source code to prevent token bankruptcy.
-   - Present your findings to the user and ask targeted, Socratic clarification questions to fill in missing business logic, specific constraints, or hidden requirements.
-   - **Quickstart Option:** Offer the "Fast Lane" setup (max 3 questions) here as well to bypass the exhaustive interview.
+2. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
+3. **IF NOT BLANK (Brownfield):** 
+   - **Index First:** Read a MAXIMUM of 10 `.md` files or 50KB total of root config files (`package.json`, etc.). STRICTLY IGNORE `node_modules`, `vendor`, `.git`. Do NOT read raw source code.
+   - Offer the "Fast Lane" vs exhaustive interview.
 
-**Phase 2: Goal Acquisition & Research**
-1. **CRITICAL:** Do NOT assume you are an expert on their domain. Overconfidence is forbidden.
-2. Retrieve evidence-backed research (via web fetch, memory search, or your training data) on the specific subject to make expert decisions based on the user's answers and the codebase analysis.
-3. Use this research to conduct an exhaustive Socratic interview gathering: business requirements, specifications, architecture, technical selection, resources, and references.
+**Phase 2: Goal Acquisition & Socratic Interview**
+Conduct an exhaustive interview gathering business requirements, architecture, technical selection, and security constraints. Do NOT assume you are an expert yet.
+
+**Phase 2.5: Mandatory Domain Distillation (ANTI-LAZINESS PROTOCOL)**
+You are FORBIDDEN from generating generic, 1-sentence context blocks. Before generating agents, you MUST:
+1. Use `webfetch` or memory to pull 2-3 authoritative sources specific to the user's domain (e.g., OWASP for web, SEC rules for trading, HIPAA for medical, framework-specific best practices).
+2. Distill this into a dense, 200-400 token `## DOMAIN HEURISTICS` block. This block MUST contain:
+   - 3 specific anti-patterns to avoid.
+   - 3 critical edge-cases or failure modes.
+   - Concrete security/compliance constraints cited from your research.
+*This block will be injected into every generated agent.*
 
 **Phase 3: Execution & Generation**
-Once the context is fully built and the interview concludes, execute the following:
-1. **Project Scaffolding:** Initialize a git repository (`git init`) and generate basic documentation (`README.md`, `docs/`, `{major_components}.md`) *only if they do not already exist*. Do not overwrite existing project documentation unless explicitly requested by the user.
-3. **Roster Building:** Analyze the topic using the retrieved research. Build a Panel Roster (required review panels) and an Agent Roster (specialists needed by the panels or the domain).
-4. **Local Agent Resolution:** 
-   - Check the local `.agents/` directory for existing agents that fit the required roles.
-   - If an existing local agent fits but needs additions for this project, modify the agent file to include the new additions (evolving the persona).
-5. **Agent Generation:** Build out any missing agents based on scientific/research-backed evidence in the `.agents/` directory. Assign the `recommended_models` metadata. Map the optimal model to the user's specific API provider.
-6. **Panel Generation:** Build the identified panels. Define their governance, required assets, expected outputs, and the results they are responsible for. Generate these panel definitions as `SKILL.md` files in the `.agents/skills/<panel-name>/` directory.
-7. **Primary Agent Generation:** Build the primary orchestrator agent (e.g., `{project}-context_master.md`). This must be a generalist agent with broad skills related to the domain and general chat helper capabilities. **CRITICAL:** Every generated orchestrator MUST implement the **Asymmetric Guard Pattern**. It must be paired with a secondary "Optimizer/Guard" agent. The Orchestrator must be explicitly instructed to spawn the Guard as a **sub-agent** (e.g., using the OS `Task` tool) to evaluate its proposed state-mutating actions (e.g., bash commands, file writes, code commits) *before* execution. The Orchestrator gets full `tools` permissions, while the Guard gets strictly read-only tools. 
-   - **Guard Protocol (JSON Envelopes):** The Orchestrator must expect a strict JSON response contract from the Guard (e.g., `{"verdict": "APPROVED" | "REJECTED", "reason": "..."}`). If the Guard response is not parsed as valid JSON or times out, the action MUST fail-closed (default to REJECTED).
-   - **Circuit Breaker (Human Arbitration):** The Guard is allowed a maximum of 2 rejections. On the 3rd rejection, the Orchestrator MUST write a `PENDING_ARBITRATION.md` file to the root workspace detailing the proposed action and the Guard's rejections. The Orchestrator MUST safely halt execution and flag the user to arbitrate.
+Execute the following:
+1. **Project Scaffolding:** Initialize `git init` if missing.
+2. **Roster Building:** Define required agents and review panels.
+3. **Agent Generation (The Anti-Laziness Template):** Generate agents in `.agents/`. You MUST inject the `## DOMAIN HEURISTICS` block from Phase 2.5 into EVERY agent. 
+4. **Panel Generation:** Build identified panels in `.agents/skills/<panel-name>/SKILL.md`. You are FORBIDDEN from generating stub panels. Every panel SKILL.md MUST include:
+   - Trigger conditions.
+   - A sequential step-by-step workflow.
+   - A strict JSON output contract (e.g., `{"panelVerdict": "...", "blockers": [...]}`).
+   - *You must immediately generate all constituent agents for the panel; do not defer them.*
+5. **Primary Agent Generation (Asymmetric Guard Pattern):** 
+   - Generate `{project}-context_master.md` with full tools.
+   - Generate `{project}-optimizer_guard.md` strictly limited to `[read, glob, grep]` tools. (Do NOT give the guard `webfetch` or `bash` to prevent exfiltration).
+   - **Inverted Whitelist (CRITICAL):** Inject this exact rule into the Orchestrator: *"You MAY execute WITHOUT Guard validation ONLY the following tools: read, glob, grep. ALL other tool invocations (bash, write, edit, task, webfetch) REQUIRE Guard approval via the `task` tool."*
+   - **Guard Protocol:** The Guard MUST return strict JSON: `{"verdict": "APPROVED" | "REJECTED" | "NEEDS_HUMAN", "policy_id": "...", "severity": "block" | "warn", "reason": "...", "remediation": "..."}`.
+   - **Concrete Circuit Breaker:** The Orchestrator MUST track Guard rejections. Inject this rule: *"On a REJECTED verdict, you must read the state file at `./.agents/state/guard_strikes.json`. If strikes >= 3, write `PENDING_ARBITRATION.md` to the workspace root, safely halt, and ask the user to arbitrate. Writing the strike file is the ONLY write operation exempt from Guard review."*
+   - **Code Verification Protocol:** Inject this exact rule: *"Before proposing any commit to the Guard, you MUST execute the project's test suite or linter (e.g., `npm test`, `cargo test`) using the `bash` tool. You must include the test output in your JSON payload to the Guard as proof of verification."*
 
 ---
 
 ### `/neurogenesis panel`
-**Trigger this command to assemble a specific professional review panel.**
-Follow the exact same research and evidence-backed interview rules as `/neurogenesis`, but narrow the focus entirely to the specific topic/domain of the requested panel (e.g., Architecture Review, Security Audit). Generate the panel governance as a skill in `.agents/skills/<panel-name>/SKILL.md` and identify/update the required local agents in `.agents/`.
-
----
-
-### `/neurogenesis agent`
-**Trigger this command to generate or refine a specific custom agent.**
-Follow the exact same research and evidence-backed interview rules as `/neurogenesis`, but narrow the focus entirely to the agent's specific role, cognitive profile, and function within the domain. Generate the `{project}-{role}.md` file in the project's `.agents/` directory.
-
----
+Trigger to assemble a specific professional review panel. Follow Phase 2.5 research rules and generate a fully-fleshed `SKILL.md` with workflow and JSON contracts in `.agents/skills/<panel-name>/`.
 
 ### `/neurogenesis map`
-**Trigger this command to optimize and update model routing for all local agents.**
-When invoked:
-1. **Agent Discovery:** Glob search the project's `.agents/` directory (or the global `~/.agents/agents/NeuroGenesis/` directory if invoked globally) for all `.md` files. Parse their YAML frontmatter, and if they contain the `recommended_models` attribute, process them for model matching.
-2. **Provider Auto-Discovery:** Attempt to auto-discover the user's configured LLM providers by inspecting common environmental config locations (e.g., `~/.config/opencode/`, `~/.claude.json`, environment variables like `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OLLAMA_API_BASE`). If discovery fails or is incomplete, explicitly ask the user which providers they have enabled.
-3. **Cost & Capability Analysis:** Fetch a live model pricing datasource (e.g., querying the OpenRouter API `https://openrouter.ai/api/v1/models` or referencing a known cost-map like LiteLLM's JSON list). Analyze each agent's defined role, function, and current `recommended_models` array against the discovered provider list and their associated costs.
-4. **Pinning the Guard:** For roles designated as the "Optimizer/Guard" (the Asymmetric Guard Pattern), you MUST prioritize mapping them to $0 local models (e.g., Ollama) if available, or the lowest-cost, fastest cloud models (e.g., `claude-3-5-haiku`, `gemini-1.5-flash`, `o3-mini`) from the user's available provider pool.
-5. **Upgrade Check:** Evaluate if a newer version of the recommended model exists (e.g., if it recommends `claude-3-opus-20240229` but a newer version is available and beneficial for the role).
-6. **User Approval (CRITICAL):** Formulate a complete proposed mapping of agents to specific models and providers. Present this list to the user along with a clear justification for each choice (specifically highlighting the cost optimization rationale for the Guard agent). **DO NOT APPLY THE MAPPING UNTIL THE USER EXPLICITLY APPROVES OR MODIFIES IT.**
+Trigger to optimize model routing for all local agents.
+1. Scan `.agents/*.md` for `recommended_models`.
+2. **Risk-Aware Pinning:** For the Guard agent, prioritize $0 local models (Ollama) or fast/cheap cloud models (`claude-3-haiku`, `gemini-1.5-flash`). HOWEVER, if Phase 2 identified this as a High-Risk domain (Finance, Medical, Infra), upgrade the Guard to a reasoning model (`gpt-4o`, `claude-3-5-sonnet`).
+3. Present the cost-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
----
-
-### `/neurogenesis evolve` (Day 2 Updates)
-**Trigger this command to sync or evolve an existing project's `.agents/` directory based on structural changes to the codebase.**
-1. Execute the **Index First, Deep-Dive Later** constraint to read the project's top-level configuration files (`package.json`, `Cargo.toml`, etc.) and root `.md` documentation to understand the current state of the application.
-2. Compare the findings against the system prompts of the current `.agents/*.md` files.
-3. **Patch Generation:** If the project has fundamentally shifted (e.g., switched from JavaScript to TypeScript, added a new testing framework, or adopted a new database), carefully propose diff patches to the `neuro-{project}-{role}.md` files to align the agents with the new reality. Do not destroy the agent's core memory or cognitive capabilities; only evolve the constraints and heuristics necessary to work correctly in the modified project structure.
-4. **Agent Archival/Creation:** Propose deleting obsolete agents (e.g., removing a frontend specialist if the project became a pure CLI tool) or generating new experts required for the evolved stack.
+### `/neurogenesis evolve`
+Trigger to patch existing `.agents/` when the codebase structure changes. Use the Index First (50KB limit) rule, then carefully patch diffs to the agents' `DOMAIN HEURISTICS` without destroying their core memory.

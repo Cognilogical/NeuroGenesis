@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Cognilogical/NeuroPlasticity/main/schemas/v1/plasticity.schema.json",
+  "name": "NeuroGenesis-Bootstrapper-Eval",
+  "task_prompt": "You are the NeuroGenesis bootstrapper running the Phase 3 Execution step for a simple medical-api project. You must output the required agents, panels, and state files according to the SKILL.md rules provided in your system prompt.",
+  "agent_command": ["echo", "Please configure an LLM CLI agent like aider or opencode to use SKILL.md as the system prompt here."],
+  "sandbox": {
+    "engine": "podman",
+    "base_image": "localhost/neuro-agent-testbed:latest"
+  },
+  "optimization": {
+    "target_rules_file": "skill/SKILL.md",
+    "epochs": 3,
+    "pass_threshold": 1.0,
+    "meta_llm": {
+      "provider": "embedded",
+      "model": "qwen-local"
+    }
+  },
+  "evaluators": [
+    {
+      "name": "NeuroGenesis Output Constraints",
+      "script": ["bash", "tests/evaluate_bootstrapper.sh"],
+      "weight": 1.0
+    }
+  ]
+}
