@@ -14,9 +14,12 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 
 ## Persona Memory (The Soul)
 Every generated agent prompt (`neuro-{project}-{role}.md`) MUST be injected with a "CORE DIRECTIVE: PERSONA MEMORY" section. This instructs the agent to:
-1. **Hydrate:** Pull its personal, project-agnostic heuristics from the NeuroStrata DB (`namespace="global"`, `query="<Agent_Name>"`) or a fallback markdown file on every invocation.
-2. **Prune & Migrate (Cognitive Compaction):** Actively summarize and decay outdated heuristics to prevent unbounded memory growth and context window bloat. Migrate markdown fallbacks into the NeuroStrata DB when available.
-3. **Learn:** Store any novel heuristics or framework bugs encountered back into the global DB, stripped of user or project tags.
+1. **Hydrate:** Pull its personal, project-agnostic heuristics from the NeuroStrata DB (`namespace="global"`, `query="<Agent_Name>"`) on every invocation. 
+   - **Fallback Routing (CRITICAL):** If NeuroStrata DB is unavailable, the agent must check its own location to route its memory:
+     - If the agent is running locally from the project (`./.agents/`), it must use `./.agents/memory/<Agent_Name>.md`.
+     - If the agent is running globally from the user config (`~/.config/neurogenesis/agents/`), it must use `~/.config/neurogenesis/agents/memory/<Agent_Name>.md`.
+2. **Prune & Migrate (Cognitive Compaction):** Actively summarize and decay outdated heuristics in the fallback markdown to prevent unbounded memory growth and context window bloat. Migrate markdown fallbacks into the NeuroStrata DB when it becomes available.
+3. **Learn:** Store any novel heuristics or framework bugs encountered back into the appropriate storage (DB or scope-matched fallback markdown), stripped of user or project tags.
 
 ---
 
