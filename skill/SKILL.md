@@ -69,6 +69,15 @@ Execute the following:
 ### `/neurogenesis panel`
 Trigger to assemble a specific professional review panel. Follow Phase 2.5 research rules and generate a fully-fleshed `SKILL.md` with workflow and JSON contracts in `.agents/skills/<panel-name>/`.
 
+### `/neurogenesis agent`
+**Trigger this command to generate a single, custom one-off agent without bootstrapping an entire project.**
+1. **Scope Inquiry:** Explicitly ask the user if they want this agent stored **Globally** (available across all projects, saved to `~/.agents/agents/`) or **Locally** (scoped to the current project, saved to `./.agents/`).
+   - If Global: Name the file `{role}.md`. Set Pass 2 Memory namespace to `"global"`.
+   - If Local: Name the file `{project}-{role}.md`. Set Pass 2 Memory namespace to `"<Project_Name>"`.
+2. **Interrogation (Phase 2):** Conduct a targeted Socratic interview to extract the agent's role, cognitive profile, needed tools, and specific constraints.
+3. **Domain Distillation (Phase 2.5):** Perform the mandatory webfetch/research to build the `## DOMAIN HEURISTICS` block (anti-patterns, edge cases, cited constraints) specific to this agent's role.
+4. **Generation (Phase 3):** Generate the agent file adhering to all Global Operating Rules (YAML frontmatter, Two-Pass Memory, etc.). If the new agent requires state-mutating tools (`bash`, `write`, `edit`), you MUST also generate its paired read-only Guard according to the Asymmetric Guard Pattern rules.
+
 ### `/neurogenesis map`
 Trigger to optimize model routing for all local agents.
 1. Scan `.agents/*.md` for `recommended_models`.
