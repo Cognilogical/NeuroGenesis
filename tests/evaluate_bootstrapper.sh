@@ -14,7 +14,8 @@ if ! grep -q 'namespace="global"' .agents/*-context_master.md || ! grep -q 'name
   FAILED=1
 fi
 
-if grep -q "tools:.*bash" .agents/*-optimizer_guard.md || grep -q "tools:.*webfetch" .agents/*-optimizer_guard.md; then 
+# Fixed regex to check YAML dictionary lines
+if grep -qE "^\s*bash:\s*true" .agents/*-optimizer_guard.md || grep -qE "^\s*webfetch:\s*true" .agents/*-optimizer_guard.md; then 
   echo "[FAIL] Guard has forbidden tools (bash or webfetch)" >&2
   FAILED=1
 fi

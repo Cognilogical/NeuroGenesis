@@ -8,8 +8,8 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 2. **Local Storage:** All agents MUST be generated and stored in the project's local `.agents/` directory.
 3. **Panel Skills Storage:** All generated review panels MUST be stored in `.agents/skills/<panel-name>/SKILL.md`.
 4. **Tool Agnosticism:** Agents and skills must be Standard Markdown with YAML frontmatter.
-5. **Model Recommendations:** Every agent MUST include a YAML frontmatter block with a `recommended_models` array (e.g., `["claude-3-5-sonnet", "o3-mini"]`). 
-6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_models`, and `tools`.
+5. **Model Recommendations:** Every agent MUST include a YAML frontmatter block with a `recommended_model` string (e.g., `"claude-3-5-sonnet"`). 
+6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_model`, and a `tools` boolean dictionary (e.g., `read: true`, `bash: true`). **CRITICAL: Using arrays for tools or models will crash the OpenCode host application.**
 
 ## Persona Memory (The Soul)
 Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: PERSONA MEMORY" section:
@@ -57,8 +57,8 @@ Execute the following:
    - A strict JSON output contract (e.g., `{"panelVerdict": "...", "blockers": [...]}`).
    - *You must immediately generate all constituent agents for the panel; do not defer them.*
 5. **Primary Agent Generation (Asymmetric Guard Pattern):** 
-   - Generate `{project}-context_master.md` with full tools.
-   - Generate `{project}-optimizer_guard.md` strictly limited to `[read, glob, grep]` tools. (Do NOT give the guard `webfetch` or `bash` to prevent exfiltration).
+   - Generate `{project}-context_master.md` with full tools as a boolean dict (`bash: true`, `write: true`, etc).
+   - Generate `{project}-optimizer_guard.md` strictly limited to `read: true`, `glob: true`, `grep: true` in the tools dict. (Do NOT give the guard `webfetch` or `bash` to prevent exfiltration).
    - **Inverted Whitelist (CRITICAL):** Inject this exact rule into the Orchestrator: *"You MAY execute WITHOUT Guard validation ONLY the following tools: read, glob, grep. ALL other tool invocations (bash, write, edit, task, webfetch) REQUIRE Guard approval via the `task` tool."*
    - **Guard Protocol:** The Guard MUST return strict JSON: `{"verdict": "APPROVED" | "REJECTED" | "NEEDS_HUMAN", "policy_id": "...", "severity": "block" | "warn", "reason": "...", "remediation": "..."}`.
    - **Concrete Circuit Breaker:** The Orchestrator MUST track Guard rejections. Inject this rule: *"On a REJECTED verdict, you must read the state file at `./.agents/state/guard_strikes.json`. If strikes >= 3, write `PENDING_ARBITRATION.md` to the workspace root, safely halt, and ask the user to arbitrate. Writing the strike file is the ONLY write operation exempt from Guard review."*
@@ -80,7 +80,7 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 
 ### `/neurogenesis map`
 Trigger to optimize model routing for all local agents.
-1. Scan `.agents/*.md` for `recommended_models`.
+1. Scan `.agents/*.md` for `recommended_model`.
 2. **Risk-Aware Pinning:** For the Guard agent, prioritize $0 local models (Ollama) or fast/cheap cloud models (`claude-3-haiku`, `gemini-1.5-flash`). HOWEVER, if Phase 2 identified this as a High-Risk domain (Finance, Medical, Infra), upgrade the Guard to a reasoning model (`gpt-4o`, `claude-3-5-sonnet`).
 3. Present the cost-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
