@@ -28,20 +28,23 @@ Every generated agent prompt (`{project}-{role}.md`) MUST be injected with a "CO
 ### `/neurogenesis`
 **Trigger this command to begin the Day 0 Bootstrap for a new or existing project.**
 
-**Phase 1: Environment Check**
+**Phase 1: Environment & Context Acquisition**
 1. Check if the current directory is blank.
-2. IF NOT BLANK: Stop and ask the user for their intent. Warn them that running this on an existing project might overwrite things, but note that if it is mostly blank/initial setup, they should proceed because you can help structure it properly.
+2. **IF BLANK (Greenfield):**
+   - Ask the user for the primary goal of the project.
+3. **IF NOT BLANK (Brownfield/Existing Project):**
+   - Inform the user that an existing project has been detected. Do NOT overwrite existing source code.
+   - Autonomously explore the directory (read `README.md`, `package.json`, `Cargo.toml`, `pyproject.toml`, etc.) to build a comprehensive understanding of the existing tech stack, architecture, and domain.
+   - Present your findings to the user and ask targeted, Socratic clarification questions to fill in missing business logic, specific constraints, or hidden requirements.
 
 **Phase 2: Goal Acquisition & Research**
-1. Ask the user for the primary goal of the project.
-2. **CRITICAL:** Do NOT assume you are an expert on their domain. Overconfidence is forbidden.
-3. Retrieve evidence-backed research (via web fetch, memory search, or your training data) on the specific subject to make expert decisions. 
-4. Use this research to conduct an exhaustive Socratic interview gathering: business requirements, specifications, architecture, technical selection, resources, and references.
+1. **CRITICAL:** Do NOT assume you are an expert on their domain. Overconfidence is forbidden.
+2. Retrieve evidence-backed research (via web fetch, memory search, or your training data) on the specific subject to make expert decisions based on the user's answers and the codebase analysis.
+3. Use this research to conduct an exhaustive Socratic interview gathering: business requirements, specifications, architecture, technical selection, resources, and references.
 
 **Phase 3: Execution & Generation**
-Once the interview concludes, execute the following:
-1. **Git:** Initialize a git repository (`git init`) if one does not exist.
-2. **Documentation:** Generate the initial project scaffolding: `README.md`, a `docs/` folder, `{major_components}.md` files, `{business_rules_workflows}.md`, and formal verification documents proving success criteria.
+Once the context is fully built and the interview concludes, execute the following:
+1. **Project Scaffolding:** Initialize a git repository (`git init`) and generate basic documentation (`README.md`, `docs/`, `{major_components}.md`) *only if they do not already exist*. Do not overwrite existing project documentation unless explicitly requested by the user.
 3. **Roster Building:** Analyze the topic using the retrieved research. Build a Panel Roster (required review panels) and an Agent Roster (specialists needed by the panels or the domain).
 4. **Local Agent Resolution:** 
    - Check the local `.agents/` directory for existing agents that fit the required roles.
