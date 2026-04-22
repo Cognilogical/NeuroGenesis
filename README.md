@@ -30,6 +30,11 @@ Your AI workforce should travel with your code. NeuroGenesis generates all Orche
 
 *Benefit: When a developer clones your project, they immediately clone the exact AI team built to defend and scale it.*
 
+### ⚡ Cost-Aware Model Matching (Dynamic Cognitive Routing)
+Most frameworks hardcode an entire swarm of agents to use a single, expensive frontier model (like GPT-4), burning your API budget instantly. NeuroGenesis treats cognitive power as a resource allocation problem. Each generated agent's YAML frontmatter declares its specific `recommended_model` requirement based on its role. The `/neurogenesis map` command dynamically maps these roles to your available API providers—routing complex Orchestrators to expensive frontier models, while pinning simple, high-frequency Guards to $0 local models (e.g., Llama-3) or sub-cent APIs (e.g., Haiku).
+
+*Benefit: Run enterprise-scale, multi-agent panels at 1/10th the API cost without sacrificing reasoning quality on the critical path.*
+
 ## Quick Start Commands
 
 Get your AI workforce up and running in minutes:
