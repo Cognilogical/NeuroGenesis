@@ -9,3 +9,10 @@
 
 /target
 .fastembed_cache/
+
+# NeuroGenesis Agent artifacts and cache
+.agents/
+.fastembed_cache/
+downloads/
+.claude/
+.beads/
