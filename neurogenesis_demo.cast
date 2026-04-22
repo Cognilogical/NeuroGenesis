@@ -1,5 +1,5 @@
 {"version": 2, "width": 80, "height": 24, "timestamp": 1713735000, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
-[0.0, "o", "\u001b[32muser@machine\u001b[0m:\u001b[34m~/NeuroGenesis\u001b[0m$ "]
+[0.0, "o", "\u001b[35m\u2728\u001b[0m "]
 [0.08, "o", "/"]
 [0.16, "o", "n"]
 [0.24, "o", "e"]
@@ -28,4 +28,4 @@
 [10.54, "o", " \u001b[32m\u2714\u001b[0m Establishing Maker-Checker Arbitration Contract...\r\n\r\n"]
 [11.54, "o", "\u001b[1m\u001b[32mSuccess!\u001b[0m Day 0 Architecture compiled to .agents/\r\n"]
 [12.04, "o", "\u001b[90mRun `ls .agents/` to view your new AI workforce.\u001b[0m\r\n"]
-[13.04, "o", "\u001b[32muser@machine\u001b[0m:\u001b[34m~/NeuroGenesis\u001b[0m$ "]
+[13.04, "o", "\u001b[35m\u2728\u001b[0m "]

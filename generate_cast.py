@@ -18,7 +18,7 @@ def write_cast(filename):
             
         t = 0.0
         
-        f.write(evt(t, "\u001b[32muser@machine\u001b[0m:\u001b[34m~/NeuroGenesis\u001b[0m$ "))
+        f.write(evt(t, "\u001b[35m\u2728\u001b[0m "))
         
         # Typing /neurogenesis
         cmd = "/neurogenesis"
@@ -64,7 +64,7 @@ def write_cast(filename):
         f.write(evt(t, "\u001b[90mRun `ls .agents/` to view your new AI workforce.\u001b[0m\r\n"))
         
         t += 1.0
-        f.write(evt(t, "\u001b[32muser@machine\u001b[0m:\u001b[34m~/NeuroGenesis\u001b[0m$ "))
+        f.write(evt(t, "\u001b[35m\u2728\u001b[0m "))
         t += 2.0
 
 write_cast('neurogenesis_demo.cast')
