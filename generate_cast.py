@@ -1,6 +1,7 @@
 import json
+import argparse
 
-def write_cast(filename):
+def write_cast(filename, prompt_type="ai"):
     with open(filename, 'w') as f:
         # Header
         header = {
@@ -18,7 +19,13 @@ def write_cast(filename):
             
         t = 0.0
         
-        f.write(evt(t, "\u001b[35m\u2728\u001b[0m "))
+        # Determine prompt string
+        if prompt_type == "shell":
+            prompt = "\u001b[32muser@machine\u001b[0m:\u001b[34m~/NeuroGenesis\u001b[0m$ "
+        else:
+            prompt = "\u001b[35m\u2728\u001b[0m "
+        
+        f.write(evt(t, prompt))
         
         # Typing /neurogenesis
         cmd = "/neurogenesis"
@@ -64,7 +71,11 @@ def write_cast(filename):
         f.write(evt(t, "\u001b[90mRun `ls .agents/` to view your new AI workforce.\u001b[0m\r\n"))
         
         t += 1.0
-        f.write(evt(t, "\u001b[35m\u2728\u001b[0m "))
+        f.write(evt(t, prompt))
         t += 2.0
 
-write_cast('neurogenesis_demo.cast')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--prompt-type', choices=['shell', 'ai'], default='ai')
+    args = parser.parse_args()
+    write_cast('neurogenesis_demo.cast', prompt_type=args.prompt_type)
