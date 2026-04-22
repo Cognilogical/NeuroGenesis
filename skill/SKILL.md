@@ -55,7 +55,7 @@ Execute the following:
    - Trigger conditions.
    - A sequential step-by-step workflow.
    - A strict JSON output contract (e.g., `{"panelVerdict": "...", "blockers": [...]}`).
-   - *You must immediately generate all constituent agents for the panel; do not defer them.*
+   - *You must immediately generate full agent markdown files in `.agents/` for EVERY constituent member of the panel (e.g., Security Sentinel, Database Expert). Do NOT assume these agents exist globally on the user's machine. The panel and its members must be 100% self-contained and portable within the project.*
 5. **Primary Agent Generation (Asymmetric Guard Pattern):** 
    - Generate `{project}-context_master.md` with full tools as a boolean dict (`bash: true`, `write: true`, etc).
    - Generate `{project}-optimizer_guard.md` strictly limited to `read: true`, `glob: true`, `grep: true` in the tools dict. (Do NOT give the guard `webfetch` or `bash` to prevent exfiltration).
