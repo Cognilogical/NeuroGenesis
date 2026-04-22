@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/images/NeuroGenesis-banner.png" alt="NeuroGenesis Banner" width="100%" />
+</div>
+
 # NeuroGenesis
 
 **The Enterprise AI Architecture Compiler**
