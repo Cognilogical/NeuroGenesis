@@ -36,10 +36,10 @@ Your AI workforce should travel with your code. NeuroGenesis generates all Orche
 
 *Benefit: When a developer clones your project, they immediately clone the exact AI team built to defend and scale it.*
 
-### ⚡ Cost-Aware Model Matching (Dynamic Cognitive Routing)
-Most frameworks hardcode an entire swarm of agents to use a single, expensive frontier model (like GPT-4), burning your API budget instantly. NeuroGenesis treats cognitive power as a resource allocation problem. Each generated agent's YAML frontmatter declares its specific `recommended_model` requirement based on its role. The `/neurogenesis map` command dynamically maps these roles to your available API providers—routing complex Orchestrators to expensive frontier models, while pinning simple, high-frequency Guards to $0 local models (e.g., Llama-3) or sub-cent APIs (e.g., Haiku).
+### ⚡ Cognitive Profile Matching (Dynamic Routing)
+Most frameworks hardcode an entire swarm of agents to use a single, homogenous model, ignoring that different tasks require fundamentally different types of reasoning. NeuroGenesis treats AI orchestration as a cognitive matching problem. Each generated agent's YAML frontmatter declares a specific `recommended_model` based on its required cognitive profile. The `/neurogenesis map` command dynamically maps these roles to the models best suited for them—routing complex, creative Orchestrators to advanced reasoning models (like GPT-4o), while pinning deterministic, rule-following Guards to fast, highly-structured models (like Claude 3.5 Haiku or local Llama-3).
 
-*Benefit: Run enterprise-scale, multi-agent panels at 1/10th the API cost without sacrificing reasoning quality on the critical path.*
+*Benefit: Build a diverse AI workforce where every agent is powered by the exact model optimized for its specific cognitive role, maximizing both capability and speed.*
 
 ## Quick Start Commands
 
@@ -49,7 +49,7 @@ Get your AI workforce up and running in minutes:
 *   `/neurogenesis panel <name>` — Generate a fully-fleshed adversarial review panel for specific workflows (e.g., PR reviews, security audits).
 *   `/neurogenesis agent` — Spin up a custom, single-purpose agent with global or local scoping.
 *   `/neurogenesis evolve` — Diff-patch your existing agents automatically when your codebase structure changes.
-*   `/neurogenesis map` — Cost-optimize your workforce (e.g., automatically pinning Guard agents to cheaper, faster models).
+*   `/neurogenesis map` — Map your workforce to the best models (e.g., routing complex tasks to reasoning models and simple tasks to fast models).
 
 ## Production Reliability
 
