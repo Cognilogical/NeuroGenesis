@@ -2,6 +2,8 @@
 
 **The Enterprise AI Architecture Compiler**
 
+![NeuroGenesis Demo](demo.gif)
+
 Build, secure, and ship a portable, self-auditing AI workforce directly inside your codebase. 
 
 NeuroGenesis doesn't just generate generic chat bots. It compiles a structured team of specialized agents that operate with strict safety boundaries, debate complex decisions, and follow your exact compliance rules—ensuring you can scale autonomous AI without risking your production environment.
