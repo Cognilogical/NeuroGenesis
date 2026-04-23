@@ -34,7 +34,8 @@ Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: P
 2. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
    *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
-3. **Model Pool Selection:** Once the user selects their provider(s), use the `bash` tool (via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
+3. **Model Pool Selection:** Once the user selects their provider(s), use the `bash` tool (via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool". 
+   - **CRITICAL:** You MUST save this selected pool to `./.agents/state/model_pool.json` for future single-agent or panel generation so the user doesn't have to repeat this step.
 4. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
 5. **IF NOT BLANK (Brownfield):** 
    - **Index First:** Read a MAXIMUM of 10 `.md` files or 50KB total of root config files (`package.json`, etc.). STRICTLY IGNORE `node_modules`, `vendor`, `.git`. Do NOT read raw source code.
@@ -76,10 +77,12 @@ Execute the following:
 
 ### `/neurogenesis panel`
 Trigger to assemble a specific professional review panel. Follow Phase 2.5 research rules and generate a fully-fleshed `SKILL.md` with workflow and JSON contracts in `.agents/skills/<panel-name>/`.
+**Model Pool Check:** You MUST check if `./.agents/state/model_pool.json` exists. If it does, use it to bind `model` properties for the new panel members. If it does not exist, run Phase 1 (Provider/Model Selection) and save it before generating the panel.
 
 ### `/neurogenesis agent`
 **Trigger this command to generate a single, custom one-off agent without bootstrapping an entire project.**
-1. **Scope Inquiry:** Explicitly ask the user if they want this agent stored **Globally** (available across all projects, saved to `~/.agents/agents/`) or **Locally** (scoped to the current project, saved to `./.agents/`).
+1. **Model Pool Check:** First, check if the project has a `.agents/state/model_pool.json` file. If not, or if generating a Global agent, you MUST run Phase 1 (Provider/Model Selection) and cache the pool.
+2. **Scope Inquiry:** Explicitly ask the user if they want this agent stored **Globally** (available across all projects, saved to `~/.agents/agents/`) or **Locally** (scoped to the current project, saved to `./.agents/`).
    - If Global: Name the file `{role}.md`. Set Pass 2 Memory namespace to `"global"`.
    - If Local: Name the file `{project}-{role}.md`. Set Pass 2 Memory namespace to `"<Project_Name>"`.
 2. **Interrogation (Phase 2):** Conduct a targeted Socratic interview to extract the agent's role, cognitive profile, needed tools, and specific constraints.
@@ -94,7 +97,8 @@ Trigger to re-optimize model routing for existing local agents based on their re
 2. **Model Retrieval & Pool Selection:** Once the user selects their provider(s), use the `bash` tool (e.g., via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
 3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
 4. **Cognitive Profile Matching:** Re-map the `model` property in each agent's YAML frontmatter to the highest priority model available in the user's new *model pool*. Read the agent's comma-separated `recommended_model` string and pick the first available match. If none are present, fallback to general cognitive profiling (creative Orchestrators vs deterministic Guards).
-5. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
+5. **State Overwrite:** Save the new model pool over the existing `./.agents/state/model_pool.json`.
+6. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
 Trigger to patch existing `.agents/` when the codebase structure changes. Use the Index First (50KB limit) rule, then carefully patch diffs to the agents' `DOMAIN HEURISTICS` without destroying their core memory.
