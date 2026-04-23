@@ -41,6 +41,16 @@ Most frameworks hardcode an entire swarm of agents to use a single, homogenous m
 
 *Benefit: Build a diverse AI workforce where every agent is powered by the exact model optimized for its specific cognitive role, maximizing both capability and speed.*
 
+## Installation
+
+NeuroGenesis installs natively as a global OpenCode Skill. To inject the commands into your terminal, run the provided install script:
+
+```bash
+git clone https://github.com/Cognilogical/NeuroGenesis.git
+cd NeuroGenesis
+./install.sh
+```
+
 ## Quick Start Commands
 
 Get your AI workforce up and running in minutes:
