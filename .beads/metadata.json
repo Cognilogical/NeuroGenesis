@@ -1,7 +1,0 @@
-{
-  "database": "dolt",
-  "backend": "dolt",
-  "dolt_mode": "embedded",
-  "dolt_database": "NeuroGenesis",
-  "project_id": "98daa688-6f63-46bd-8508-2028a5d91a92"
-}
