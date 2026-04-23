@@ -31,11 +31,11 @@ Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: P
 
 **Phase 1: Environment & Model Pool Acquisition**
 1. Check if the current directory is blank.
-2. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
+2. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project using a **multi-select checklist**: 
    *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
 3. **Model Pool Selection:** Once the user selects their provider(s), use the `bash` tool (via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool". 
-   - **CRITICAL:** You MUST save this selected pool to `./.agents/state/model_pool.json` for future single-agent or panel generation so the user doesn't have to repeat this step.
+   - **CRITICAL:** You MUST save this selected pool to `./.agents/state/model_pool.json` structured by provider (e.g., `{"openai": ["gpt-4o", "o1"], "anthropic": ["claude-3-5-sonnet"]}`) for future single-agent or panel generation so the user doesn't have to repeat this step.
 4. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
 5. **IF NOT BLANK (Brownfield):** 
    - **Index First:** Read a MAXIMUM of 10 `.md` files or 50KB total of root config files (`package.json`, etc.). STRICTLY IGNORE `node_modules`, `vendor`, `.git`. Do NOT read raw source code.
@@ -91,13 +91,12 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 
 ### `/neurogenesis map`
 Trigger to re-optimize model routing for existing local agents based on their required cognitive profiles.
-1. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
-   *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
+1. **Provider Selection:** Present the user with the curated list of major supported model providers (see Phase 1) as a **multi-select checklist** and ask them to select the provider(s) they want to add or update.
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
-2. **Model Retrieval & Pool Selection:** Once the user selects their provider(s), use the `bash` tool (e.g., via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
+2. **Model Retrieval & Pool Selection:** Query `https://models.dev/` to find the exact model names available for the chosen provider(s). Present this list as a multi-select checklist (using the `question` tool) so the user can select the models they have access to.
 3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
 4. **Cognitive Profile Matching:** Re-map the `model` property in each agent's YAML frontmatter to the highest priority model available in the user's new *model pool*. Read the agent's comma-separated `recommended_model` string and pick the first available match. If none are present, fallback to general cognitive profiling (creative Orchestrators vs deterministic Guards).
-5. **State Overwrite:** Save the new model pool over the existing `./.agents/state/model_pool.json`.
+5. **State Merge:** Merge the new model selections into the existing `./.agents/state/model_pool.json` by updating only the specific provider sections the user modified. Do NOT overwrite the entire file and erase unselected providers.
 6. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
