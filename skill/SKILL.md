@@ -79,10 +79,11 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 4. **Generation (Phase 3):** Generate the agent file adhering to all Global Operating Rules (YAML frontmatter, Two-Pass Memory, etc.). If the new agent requires state-mutating tools (`bash`, `write`, `edit`), you MUST also generate its paired read-only Guard according to the Asymmetric Guard Pattern rules.
 
 ### `/neurogenesis map`
-Trigger to optimize model routing for all local agents.
-1. Scan `.agents/*.md` for `recommended_model`.
-2. **Risk-Aware Pinning:** For the Guard agent, prioritize $0 local models (Ollama) or fast/cheap cloud models (`claude-3-haiku`, `gemini-1.5-flash`). HOWEVER, if Phase 2 identified this as a High-Risk domain (Finance, Medical, Infra), upgrade the Guard to a reasoning model (`gpt-4o`, `claude-3-5-sonnet`).
-3. Present the cost-optimized mapping to the user for approval. DO NOT APPLY until approved.
+Trigger to optimize model routing for all local agents based on their required cognitive profiles.
+1. Use the `webfetch` tool to retrieve the current list of available models from `https://models.dev/`. Do NOT hallucinate or guess available models; you MUST use this source as the absolute source of truth.
+2. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
+3. **Cognitive Profile Matching:** Map each agent to the most appropriate model from `https://models.dev/`. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models. Ensure the selected model strictly exists in the fetched list.
+4. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
 Trigger to patch existing `.agents/` when the codebase structure changes. Use the Index First (50KB limit) rule, then carefully patch diffs to the agents' `DOMAIN HEURISTICS` without destroying their core memory.
