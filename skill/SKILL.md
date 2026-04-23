@@ -82,6 +82,7 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 Trigger to optimize model routing for all local agents based on their required cognitive profiles.
 1. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
    *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
+   **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
 2. **Model Retrieval:** Once the user selects their provider(s), use the `bash` tool (e.g., via `curl` or a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Do NOT hallucinate model names.
 3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
 4. **Cognitive Profile Matching:** Map each agent to the most appropriate model from the fetched provider list. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models. Ensure the selected model strictly exists in the fetched list.
