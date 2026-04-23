@@ -9,9 +9,9 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 3. **Panel Skills Storage:** All generated review panels MUST be stored in `.agents/skills/<panel-name>/SKILL.md`.
 4. **Tool Agnosticism:** Agents and skills must be Standard Markdown with YAML frontmatter.
 5. **Model Recommendations & Binding:** Every agent MUST include two model-related fields in its YAML frontmatter:
-   - `recommended_model`: A string representing the theoretical best provider-agnostic model for this role's cognitive profile (e.g., `"claude-3-5-sonnet"`).
+   - `recommended_model`: A comma-separated string representing a prioritized list of the theoretical best provider-agnostic models for this role's cognitive profile (e.g., `"claude-3-5-sonnet, gpt-4o, gemini-1.5-pro"`). The first is the ideal choice, followed by fallbacks.
    - `model`: A string representing the exact executable model from the user's available pool, formatted exactly as it appears in the target provider's registry (e.g., `"github copilot/gpt-4o"` or `"openrouter/anthropic/claude-3.5-sonnet"`). 
-6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_model`, `model`, and a `tools` boolean dictionary (e.g., `read: true`, `bash: true`). **CRITICAL: Using arrays for tools or models will crash the OpenCode host application.**
+6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_model`, `model`, and a `tools` boolean dictionary (e.g., `read: true`, `bash: true`). **CRITICAL: Using arrays for tools or models will crash the OpenCode host application. ALWAYS use comma-separated strings instead of YAML arrays.**
 
 ## Persona Memory (The Soul)
 Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: PERSONA MEMORY" section:
@@ -57,8 +57,8 @@ Execute the following:
 1. **Project Scaffolding:** Initialize `git init` if missing.
 2. **Roster Building:** Define required agents and review panels.
 3. **Agent Generation (The Anti-Laziness Template):** Generate agents in `.agents/`. You MUST inject the `## DOMAIN HEURISTICS` block from Phase 2.5 into EVERY agent. For the YAML frontmatter:
-   - Set `recommended_model` to the theoretical ideal provider-agnostic model for this specific role's cognitive profile.
-   - Set `model: "provider/model_id"` by selecting the absolute best match strictly from the user's selected *model pool* (from Phase 1). If no perfect match exists, select the closest capable fallback from their pool.
+   - Set `recommended_model` to a prioritized comma-separated string of the theoretical ideal provider-agnostic models for this specific role's cognitive profile (e.g. `"claude-3-5-sonnet, gpt-4o"`).
+   - Set `model: "provider/model_id"` by selecting the absolute best match strictly from the user's selected *model pool* (from Phase 1). Iterate through the `recommended_model` priority list and pick the highest available. If no match exists, select the closest capable fallback from their pool based on cognitive profile.
 4. **Panel Generation:** Build identified panels in `.agents/skills/<panel-name>/SKILL.md`. You are FORBIDDEN from generating stub panels. Every panel SKILL.md MUST include:
    - Trigger conditions.
    - A sequential step-by-step workflow.
@@ -93,7 +93,7 @@ Trigger to re-optimize model routing for existing local agents based on their re
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
 2. **Model Retrieval & Pool Selection:** Once the user selects their provider(s), use the `bash` tool (e.g., via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
 3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
-4. **Cognitive Profile Matching:** Re-map the `model` property in each agent's YAML frontmatter to the most appropriate model strictly from the user's new *model pool*. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models.
+4. **Cognitive Profile Matching:** Re-map the `model` property in each agent's YAML frontmatter to the highest priority model available in the user's new *model pool*. Read the agent's comma-separated `recommended_model` string and pick the first available match. If none are present, fallback to general cognitive profiling (creative Orchestrators vs deterministic Guards).
 5. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
