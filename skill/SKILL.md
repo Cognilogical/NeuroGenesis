@@ -8,8 +8,10 @@ The "Day 0" Cognitive Bootstrapper for the Neuro Agentic AI OS. This skill condu
 2. **Local Storage:** All agents MUST be generated and stored in the project's local `.agents/` directory.
 3. **Panel Skills Storage:** All generated review panels MUST be stored in `.agents/skills/<panel-name>/SKILL.md`.
 4. **Tool Agnosticism:** Agents and skills must be Standard Markdown with YAML frontmatter.
-5. **Model Recommendations:** Every agent MUST include a YAML frontmatter block with a `recommended_model` string (e.g., `"claude-3-5-sonnet"`). 
-6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_model`, and a `tools` boolean dictionary (e.g., `read: true`, `bash: true`). **CRITICAL: Using arrays for tools or models will crash the OpenCode host application.**
+5. **Model Recommendations & Binding:** Every agent MUST include two model-related fields in its YAML frontmatter:
+   - `recommended_model`: A string representing the theoretical best provider-agnostic model for this role's cognitive profile (e.g., `"claude-3-5-sonnet"`).
+   - `model`: A string representing the exact executable model from the user's available pool, formatted exactly as it appears in the target provider's registry (e.g., `"github copilot/gpt-4o"` or `"openrouter/anthropic/claude-3.5-sonnet"`). 
+6. **Agent Format Rule:** Agents must have a YAML block specifying `name`, `role`, `description`, `recommended_model`, `model`, and a `tools` boolean dictionary (e.g., `read: true`, `bash: true`). **CRITICAL: Using arrays for tools or models will crash the OpenCode host application.**
 
 ## Persona Memory (The Soul)
 Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: PERSONA MEMORY" section:
@@ -27,10 +29,14 @@ Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: P
 ### `/neurogenesis`
 **Trigger this command to begin the Day 0 Bootstrap for a new or existing project.**
 
-**Phase 1: Environment & Context Acquisition**
+**Phase 1: Environment & Model Pool Acquisition**
 1. Check if the current directory is blank.
-2. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
-3. **IF NOT BLANK (Brownfield):** 
+2. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
+   *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
+   **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
+3. **Model Pool Selection:** Once the user selects their provider(s), use the `bash` tool (via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
+4. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
+5. **IF NOT BLANK (Brownfield):** 
    - **Index First:** Read a MAXIMUM of 10 `.md` files or 50KB total of root config files (`package.json`, etc.). STRICTLY IGNORE `node_modules`, `vendor`, `.git`. Do NOT read raw source code.
    - Offer the "Fast Lane" vs exhaustive interview.
 
@@ -50,7 +56,9 @@ You are FORBIDDEN from generating generic, 1-sentence context blocks. Before gen
 Execute the following:
 1. **Project Scaffolding:** Initialize `git init` if missing.
 2. **Roster Building:** Define required agents and review panels.
-3. **Agent Generation (The Anti-Laziness Template):** Generate agents in `.agents/`. You MUST inject the `## DOMAIN HEURISTICS` block from Phase 2.5 into EVERY agent. 
+3. **Agent Generation (The Anti-Laziness Template):** Generate agents in `.agents/`. You MUST inject the `## DOMAIN HEURISTICS` block from Phase 2.5 into EVERY agent. For the YAML frontmatter:
+   - Set `recommended_model` to the theoretical ideal provider-agnostic model for this specific role's cognitive profile.
+   - Set `model: "provider/model_id"` by selecting the absolute best match strictly from the user's selected *model pool* (from Phase 1). If no perfect match exists, select the closest capable fallback from their pool.
 4. **Panel Generation:** Build identified panels in `.agents/skills/<panel-name>/SKILL.md`. You are FORBIDDEN from generating stub panels. Every panel SKILL.md MUST include:
    - Trigger conditions.
    - A sequential step-by-step workflow.
@@ -79,13 +87,13 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 4. **Generation (Phase 3):** Generate the agent file adhering to all Global Operating Rules (YAML frontmatter, Two-Pass Memory, etc.). If the new agent requires state-mutating tools (`bash`, `write`, `edit`), you MUST also generate its paired read-only Guard according to the Asymmetric Guard Pattern rules.
 
 ### `/neurogenesis map`
-Trigger to optimize model routing for all local agents based on their required cognitive profiles.
+Trigger to re-optimize model routing for existing local agents based on their required cognitive profiles.
 1. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
    *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
-2. **Model Retrieval & Pool Selection:** Once the user selects their provider(s), use the `bash` tool (e.g., via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Do NOT hallucinate model names. Present this list to the user as a multi-select checklist (using the `question` tool if available, or markdown) and ask them to select all the models they currently have access to. This creates the "model pool".
+2. **Model Retrieval & Pool Selection:** Once the user selects their provider(s), use the `bash` tool (e.g., via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool".
 3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
-4. **Cognitive Profile Matching:** Map each agent to the most appropriate model strictly from the user's selected *model pool*. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models.
+4. **Cognitive Profile Matching:** Re-map the `model` property in each agent's YAML frontmatter to the most appropriate model strictly from the user's new *model pool*. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models.
 5. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
