@@ -6,7 +6,7 @@
 
 **The Enterprise AI Architecture Compiler**
 
-![NeuroGenesis Demo](demo.gif)
+![NeuroGenesis Demo](docs/images/demo.gif)
 
 Build, secure, and ship a portable, self-auditing AI workforce directly inside your codebase. 
 
