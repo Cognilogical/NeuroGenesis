@@ -80,10 +80,12 @@ Trigger to assemble a specific professional review panel. Follow Phase 2.5 resea
 
 ### `/neurogenesis map`
 Trigger to optimize model routing for all local agents based on their required cognitive profiles.
-1. Use the `webfetch` tool to retrieve the current list of available models from `https://models.dev/`. Do NOT hallucinate or guess available models; you MUST use this source as the absolute source of truth.
-2. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
-3. **Cognitive Profile Matching:** Map each agent to the most appropriate model from `https://models.dev/`. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models. Ensure the selected model strictly exists in the fetched list.
-4. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
+1. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) for this project: 
+   *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
+2. **Model Retrieval:** Once the user selects their provider(s), use the `bash` tool (e.g., via `curl` or a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Do NOT hallucinate model names.
+3. Scan `.agents/*.md` for the `recommended_model` and the cognitive profile/role of each agent.
+4. **Cognitive Profile Matching:** Map each agent to the most appropriate model from the fetched provider list. Route complex, creative Orchestrators to advanced reasoning models, while pinning deterministic, rule-following Guards to fast, highly-structured models. Ensure the selected model strictly exists in the fetched list.
+5. Present the cognitively-optimized mapping to the user for approval. DO NOT APPLY until approved.
 
 ### `/neurogenesis evolve`
 Trigger to patch existing `.agents/` when the codebase structure changes. Use the Index First (50KB limit) rule, then carefully patch diffs to the agents' `DOMAIN HEURISTICS` without destroying their core memory.
