@@ -13,14 +13,8 @@ mkdir -p "$COMMANDS_DIR"
 # Copy the SKILL.md file
 cp skill/SKILL.md "$SKILLS_DIR/SKILL.md"
 
-# Register the slash command
-cat << 'INNER_EOF' > "$COMMANDS_DIR/neurogenesis.md"
----
-description: "Trigger this command to begin the Day 0 Bootstrap for a new or existing project. Usage: /neurogenesis, /neurogenesis panel, /neurogenesis agent, /neurogenesis map, /neurogenesis evolve"
----
-
-Load the `neurogenesis` skill using the skill tool, then execute the `/neurogenesis` command workflow described in that skill. Pass these arguments to the workflow: $ARGUMENTS
-INNER_EOF
+# Register the slash command from the repository
+cp commands/neurogenesis.md "$COMMANDS_DIR/neurogenesis.md"
 
 echo "✅ NeuroGenesis successfully installed!"
 echo "You can now use the /neurogenesis slash commands in any OpenCode session."
