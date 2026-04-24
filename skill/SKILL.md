@@ -35,8 +35,18 @@ Every generated agent prompt MUST be injected with this EXACT "CORE DIRECTIVE: P
 3. **Provider Selection:** Present the user with the following curated list of major supported model providers and ask them to select their preferred provider(s) using a **multi-select checklist**: 
    *OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI, Cohere, Groq, Together AI, Hugging Face, Amazon Bedrock, Azure, OpenCode Zen, OpenRouter, GitHub Copilot*.
    **CRITICAL:** You must also include this exact message: *"Don't see your provider? Please visit https://models.dev/, find your provider ID, and type it below."*
-4. **Model Pool Selection:** Once the user selects their provider(s), use the `bash` tool (via a python script) to query `https://models.dev/` to find the exact, current model names available for the chosen provider(s). Present this list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool". 
-   - **CRITICAL:** You MUST save this selected pool to `~/.config/NeuroGenesis/model_pool.json` structured by provider (e.g., `{"openai": ["gpt-4o", "o1"], "anthropic": ["claude-3-5-sonnet"]}`) for future use across all projects.
+4. **Model Pool Selection:** Once the user selects their provider(s), you MUST programmatically query the `models.dev` API to retrieve the complete and accurate list of current models for those specific providers. DO NOT hardcode a short list.
+   - Use the `bash` tool to run a Python script that fetches and parses `https://models.dev/api.json`.
+   - **Python Snippet Example:**
+     ```python
+     import urllib.request, json
+     req = urllib.request.Request("https://models.dev/api.json", headers={'User-Agent': 'Mozilla/5.0'})
+     with urllib.request.urlopen(req) as response:
+         data = json.loads(response.read().decode())
+     # Extract data[provider_id]['models'] for the selected providers
+     ```
+   - Present this fully extracted list to the user as a multi-select checklist (using the `question` tool) and ask them to select all the models they currently have access to. This creates the "model pool". 
+   - **CRITICAL:** You MUST save this selected pool to `~/.config/NeuroGenesis/model_pool.json` structured by provider (e.g., `{"github-copilot": ["gpt-5.1", "claude-sonnet-4.6"]}`) for future use across all projects.
 5. **IF BLANK (Greenfield):** Ask the user for the primary goal. Offer a "Fast Lane" (max 3 questions) vs exhaustive interview.
 5. **IF NOT BLANK (Brownfield):** 
    - **Index First:** Read a MAXIMUM of 10 `.md` files or 50KB total of root config files (`package.json`, etc.). STRICTLY IGNORE `node_modules`, `vendor`, `.git`. Do NOT read raw source code.
