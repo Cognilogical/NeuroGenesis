@@ -71,6 +71,8 @@ Execute the following:
 3. **Agent Generation (The Anti-Laziness Template):** Generate agents in `.agents/`. You MUST inject the `## DOMAIN HEURISTICS` block from Phase 2.5 into EVERY agent. For the YAML frontmatter:
    - Set `recommended_model` to a prioritized comma-separated string of the theoretical ideal provider-agnostic models for this specific role's cognitive profile (e.g. `"claude-3-5-sonnet, gpt-4o"`).
    - Set `model: "provider/model_id"` by selecting the absolute best match strictly from the user's selected *model pool* (from Phase 1). Iterate through the `recommended_model` priority list and pick the highest available. If no match exists, select the closest capable fallback from their pool based on cognitive profile.
+   - **CRITICAL YAML RULE:** The `tools` property MUST be a record (dictionary) of booleans (e.g., `tools:\n  bash: true\n  write: true`), NEVER a string or array.
+   - **CRITICAL TOOL INVOCATION RULE:** You MUST inject this exact rule into the operating rules of EVERY generated agent: *"NEVER invoke tools (like `neurostrata_neurostrata_add_memory`, `bash`, `write`, etc.) while generating your final summary or response. All tool executions MUST be completed BEFORE you finalize your task."*
 4. **Panel Generation:** Build identified panels in `.agents/skills/<panel-name>/SKILL.md`. You are FORBIDDEN from generating stub panels. Every panel SKILL.md MUST include:
    - Trigger conditions.
    - A sequential step-by-step workflow.
