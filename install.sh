@@ -58,6 +58,8 @@ HTML_PAGE = """
         body { font-family: -apple-system, system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background: #f4f4f5; color: #333; }
         .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         h1 { margin-top: 0; color: #111; }
+        .search-bar { width: 100%; padding: 14px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 20px; box-sizing: border-box; }
+        .search-bar:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
         .provider-card { margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; overflow: hidden; }
         .provider-header { font-size: 1.1em; font-weight: 600; padding: 15px; background: #fdfdfd; cursor: pointer; display: flex; justify-content: space-between; user-select: none; }
         .provider-header:hover { background: #f5f5f5; }
@@ -86,6 +88,33 @@ HTML_PAGE = """
         function setAll(provider, state, event) {
             event.stopPropagation();
             document.querySelectorAll(".mod-" + provider).forEach(cb => cb.checked = state);
+            filterProviders(); // Re-evaluate filter in case this triggers a pin
+        }
+        function filterProviders() {
+            const filterText = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".provider-card");
+
+            cards.forEach(card => {
+                const providerName = card.dataset.provider.toLowerCase();
+                const checkboxes = card.querySelectorAll("input[type='\''checkbox'\'']");
+                let hasChecked = false;
+                let hasModelMatch = false;
+
+                checkboxes.forEach(cb => {
+                    if (cb.checked) hasChecked = true;
+                    if (cb.dataset.model.toLowerCase().includes(filterText)) hasModelMatch = true;
+                });
+
+                const providerMatch = providerName.includes(filterText);
+
+                if (filterText === "") {
+                    card.style.display = ""; // Show all
+                } else if (hasChecked || providerMatch || hasModelMatch) {
+                    card.style.display = ""; // Show if matching OR pinned (has checked models)
+                } else {
+                    card.style.display = "none"; // Hide
+                }
+            });
         }
         function save() {
             const result = {};
@@ -103,7 +132,8 @@ HTML_PAGE = """
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(result)
             }).then(() => {
-                document.body.innerHTML = "<div class='\''container'\''><h1>[OK] Models Saved!</h1><p>You can close this browser tab and return to your terminal.</p></div>";
+                document.body.innerHTML = "<div class='container'><h1>[OK] Models Saved!</h1><p>You can close this browser tab and return to your terminal.</p></div>";
+                setTimeout(() => window.close(), 100);
             });
         }
     </script>
@@ -111,7 +141,8 @@ HTML_PAGE = """
 <body>
     <div class="container">
         <h1>NeuroGenesis Setup</h1>
-        <p>Click on a provider to expand it and select the models you have access to.</p>
+        <p>Search for a provider or model (e.g., 'copilot'), and select the models you have access to. Providers with checked models will remain pinned to the top of the filter.</p>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search providers or models..." onkeyup="filterProviders()">
         <div id="providers">
             <!-- INJECT_HERE -->
         </div>
@@ -131,7 +162,7 @@ for p, models in providers_data.items():
     html_content += f"<span class=\"action-links\" onclick=\"setAll('\''{p}'\'', false, event)\">Deselect All</span></div>"
     html_content += f"<div class=\"models-grid\">"
     for m in models:
-        html_content += f"<div class=\"model-item\"><input type=\"checkbox\" class=\"mod-{p}\" data-model=\"{m}\"><label>{m}</label></div>"
+        html_content += f"<div class=\"model-item\"><input type=\"checkbox\" class=\"mod-{p}\" data-model=\"{m}\" onchange=\"filterProviders()\"><label>{m}</label></div>"
     html_content += "</div></div></div>"
 
 HTML_PAGE = HTML_PAGE.replace("<!-- INJECT_HERE -->", html_content)
